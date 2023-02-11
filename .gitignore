@@ -1,4 +1,4 @@
-\.vscode
-\.metals
-\Script\.bsp
-\Script\.scala-build
+/.vscode/
+/.metals/
+/Script/.bsp
+/Script/.scala-build
