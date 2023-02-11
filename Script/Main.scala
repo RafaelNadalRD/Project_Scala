@@ -106,7 +106,15 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
       println("Empty Canvas")
     } else {
       println(s"Size: $width x $height")
-      // TODO
+      
+      // OUR CODE//////////////////////
+      for (row <- pixels) {
+        for (pixel <- row) {
+          print(pixel)
+        }
+        println()
+      }
+      //////////////////////////////////
     }
   }
 
