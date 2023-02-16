@@ -47,6 +47,8 @@ object Main extends App {
       case "dummy" => Canvas.dummy
       case "dummy2" => Canvas.dummy2
       // TODO: Add command here
+      
+      case "new_canvas" => canvas.new_canvas
       case _ => Canvas.default
     }
 
@@ -140,6 +142,32 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
   }
 
   // TODO: Add any useful method
+
+  /////OUR CODE////////////////
+  
+  /**
+  * Create a new canvas
+  */
+
+  def new_canvas(arguments: Seq[String], canvas: Canvas): (Canvas, Status) =
+  arguments match {
+    case Seq(widthStr, heightStr, char) => {
+      try {
+        val width = widthStr.toInt
+        val height = heightStr.toInt
+        val pixels = Vector.fill(height, width)(Pixel(0, 0, char.head))
+        val newCanvas = Canvas(width, height, pixels)
+        (newCanvas, Status())
+      } catch {
+        case e: Exception =>
+          (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+      }
+    }
+    case _ =>
+      (canvas, Status(error = true, message = "Invalid number of arguments"))
+  }
+
+
 }
 
 /**
@@ -198,4 +226,7 @@ object Canvas {
     }
 
   // TODO: Add any useful method
+
 }
+
+
