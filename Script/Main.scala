@@ -80,16 +80,19 @@ object Pixel {
    * Create a Pixel from a string "x,y"
    */
   def apply(s: String): Pixel = {
-    // TODO
-    Pixel(0, 0)
+    // OUR CODE /////////////////////
+    val Array(x, y) = s.split(",")
+    Pixel(x.toInt, y.toInt)
+    ////////////////////////////////
   }
 
   /**
    * Create a Pixel from a string "x,y" and a color 
    */
   def apply(s: String, color: Char): Pixel = {
-    // TODO
-    Pixel(0, 0)
+    // OUR CODE /////////////////////
+    val Array(x, y) = s.split(",")
+    Pixel(x.toInt, y.toInt, color)
   }
 }
 
@@ -187,7 +190,7 @@ object Canvas {
         width = 3,
         height = 1,
         pixels = Vector(
-          Vector(Pixel("0,0", '#'), Pixel("1,0"), Pixel("2,0", '#')),
+          Vector(Pixel("0,0", '#'), Pixel("1,0",'.'), Pixel("2,0", '#')),
         )
       )
       
