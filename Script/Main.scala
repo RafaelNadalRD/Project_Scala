@@ -49,40 +49,13 @@ object Main extends App {
       case "dummy2" => Canvas.dummy2
       // TODO: Add command here
       
-      case "load_image" => load_image
+      case "load_image" => Canvas.load_image
       case "new_canvas" => canvas.new_canvas
       case _ => Canvas.default
     }
 
     execution(action.tail, canvas)
   }
-
-  /**
-   * Load image from file to create a canvas
-   */
-  def load_image(action: Seq[String], canvas: Canvas): (Canvas, Status) = {
-    val fileName = action.head
-    val path = s"D:/Cours/ESGI/Scala/Projet scala github/Project_Scala/Utilities/$fileName"
-    
-    val status = Status()
-    val fileContent = try {
-      Source.fromFile(path).getLines().toVector
-    } catch {
-      case e: Exception =>
-        return (canvas, status.copy(error = true, message = s"Failed to read file '$fileName'"))
-    }
-    
-    if (fileContent.isEmpty) {
-      return (canvas, status.copy(error = true, message = s"File '$fileName' is empty"))
-    }
-
-    // Create a new canvas from the file content
-    val pixels = fileContent.map(_.toCharArray).map(_.toVector).map(row => row.map(c => Pixel(0, 0, c)))
-    val newCanvas = canvas.copy(width = pixels(0).length, height = pixels.length, pixels = pixels)
-    println(s"Loaded image from file '$fileName'")
-    (newCanvas, status)
-  }
-
 
 
 }
@@ -261,6 +234,35 @@ object Canvas {
 
   // TODO: Add any useful method
 
+/////OUR CODE//////
+
+  /**
+   * Load image from file to create a canvas
+   */
+  def load_image(action: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    val fileName = action.head
+    val path = s"D:/Cours/ESGI/Scala/Projet scala github/Project_Scala/Utilities/$fileName"
+    
+    val status = Status()
+    val fileContent = try {
+      Source.fromFile(path).getLines().toVector
+    } catch {
+      case e: Exception =>
+        return (canvas, status.copy(error = true, message = s"Failed to read file '$fileName'"))
+    }
+    
+    if (fileContent.isEmpty) {
+      return (canvas, status.copy(error = true, message = s"File '$fileName' is empty"))
+    }
+
+    // Create a new canvas from the file content
+    val pixels = fileContent.map(_.toCharArray).map(_.toVector).map(row => row.map(c => Pixel(0, 0, c)))
+    val newCanvas = canvas.copy(width = pixels(0).length, height = pixels.length, pixels = pixels)
+    println(s"Loaded image from file '$fileName'")
+    (newCanvas, status)
+  }
+
+  
 }
 
 
