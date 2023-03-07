@@ -49,6 +49,8 @@ object Main extends App {
       case "dummy2" => Canvas.dummy2
       // TODO: Add command here
       
+
+      case "update_pixel" => canvas.update_pixel
       case "load_image" => Canvas.load_image
       case "new_canvas" => canvas.new_canvas
       case _ => Canvas.default
@@ -171,7 +173,24 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
       (canvas, Status(error = true, message = "Invalid number of arguments"))
   }
 
-
+  def update_pixel(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(xStr, yStr, color) => {
+        try {
+          val x = xStr.toInt
+          val y = yStr.toInt
+          val newPixels = pixels.updated(y, pixels(y).updated(x, Pixel(x, y, color.head)))
+          val newCanvas = this.copy(pixels = newPixels)
+          (newCanvas, Status())
+        } catch {
+          case e: Exception =>
+          (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+        }
+      }
+      case _ =>
+      (canvas, Status(error = true, message = "Invalid number of arguments"))
+    }
+  }
   
 
 
@@ -234,7 +253,7 @@ object Canvas {
 
   // TODO: Add any useful method
 
-/////OUR CODE//////
+  /////OUR CODE//////
 
   /**
    * Load image from file to create a canvas
