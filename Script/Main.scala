@@ -173,6 +173,10 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
       (canvas, Status(error = true, message = "Invalid number of arguments"))
   }
 
+ /**
+  * Update a pixel based on his coordinates 
+  */
+
   def update_pixel(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
       case Seq(xStr, yStr, color) => {
