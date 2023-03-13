@@ -264,7 +264,8 @@ object Canvas {
    */
   def load_image(action: Seq[String], canvas: Canvas): (Canvas, Status) = {
     val fileName = action.head
-    val path = s"D:/Cours/ESGI/Scala/Projet scala github/Project_Scala/Utilities/$fileName"
+    
+    val path = s"../Utilities/$fileName"
     
     val status = Status()
     val fileContent = try {
