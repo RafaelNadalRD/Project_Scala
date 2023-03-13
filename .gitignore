@@ -2,5 +2,6 @@
 /.metals/
 /Script/.bsp
 /Script/.scala-build
+/Script/.metals/
 *.log
 *.json
