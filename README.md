@@ -5,6 +5,8 @@ Etape 1: Executez  le fichier "Script/Main.scala" une première fois pour le com
 	 scala-cli run .\Main.scala
 
 
+TO DO LISTE:
+- Expliquer dans le readme.md que la fonction update_pixel modifie le pixel avec des coordonnées commençant par 0 (donc  	modifie le pixel 2.2)
 
 New canvas:
 
