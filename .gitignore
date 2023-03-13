@@ -1,0 +1,6 @@
+/.vscode/
+/.metals/
+/Script/.bsp
+/Script/.scala-build
+*.log
+*.json
