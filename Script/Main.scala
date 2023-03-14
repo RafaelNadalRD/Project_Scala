@@ -195,7 +195,7 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
       (canvas, Status(error = true, message = "Invalid number of arguments"))
     }
   }
-  
+  gros caca
 
 
 }
