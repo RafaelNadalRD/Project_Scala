@@ -8,6 +8,8 @@ Etape 1: Executez  le fichier "Script/Main.scala" une première fois pour le com
 TO DO LISTE:
 - Expliquer dans le readme.md que la fonction update_pixel modifie le pixel avec des coordonnées commençant par 0 (donc  	modifie le pixel 2.2)
 
+La méthode update_pixel prend en entrée une séquence de chaînes de caractères action et une instance de la case class Canvas. Elle vérifie d'abord que la longueur de l'action est suffisante pour mettre à jour un pixel, sinon elle renvoie une instance du case class Status avec un message d'erreur. Elle essaie ensuite de convertir les deux premiers éléments de l'action en entiers (x et y) et le troisième élément en caractère (la couleur du pixel à mettre à jour). Si la conversion réussit, elle appelle la méthode update de la case class Canvas avec un nouveau Pixel contenant les coordonnées et la couleur spécifiées, met à jour l'instance de la case class Canvas et renvoie une nouvelle instance de la case class Status sans message d'erreur. Si la conversion échoue ou si les coordonnées du pixel à mettre à jour sont hors des limites du canvas, elle renvoie une instance de la case class Status avec un message d'erreur.
+
 New canvas:
 
 Cette implémentation vérifie que la liste d'arguments passée en paramètre contient bien 3 éléments, sinon elle renvoie un statut d'erreur.
