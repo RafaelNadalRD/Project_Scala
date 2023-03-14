@@ -54,6 +54,7 @@ object Main extends App {
       case "load_image" => Canvas.load_image
       case "new_canvas" => canvas.new_canvas
       case "Draw_line" => canvas.draw_line
+      case "Draw_line2" => canvas.draw_line2
       case _ => Canvas.default
     }
 
@@ -232,6 +233,49 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           } else {
             return (canvas, Status(error = true, message = "Only horizontal and vertical lines are supported."))
           }
+          (newCanvas, Status())
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+        }
+      }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments"))
+    }
+  }
+
+  def draw_line2(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(x1Str, y1Str, x2Str, y2Str, color) => {
+        try {
+          val x1 = x1Str.toInt
+          val y1 = y1Str.toInt
+          val x2 = x2Str.toInt
+          val y2 = y2Str.toInt
+
+          val dx = x2 - x1
+          val dy = y2 - y1
+          var D = 2 * dy - dx
+          var y = y1
+
+          var newCanvas = canvas
+
+          for (x <- x1 to x2) {
+            val args = Seq(x.toString, y.toString, color)
+            val (updatedCanvas, status) = newCanvas.update_pixel(args, newCanvas)
+            if (status.error) {
+              return (updatedCanvas, status)
+            } else {
+              newCanvas = updatedCanvas
+            }
+
+            if (D > 0) {
+              y = y + 1
+              D = D - 2 * dx
+            }
+            D = D + 2 * dy
+          }
+          
           (newCanvas, Status())
         } catch {
           case e: Exception =>
