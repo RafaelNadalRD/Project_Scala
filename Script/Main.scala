@@ -53,6 +53,7 @@ object Main extends App {
       case "update_pixel" => canvas.update_pixel
       case "load_image" => Canvas.load_image
       case "new_canvas" => canvas.new_canvas
+      case "Draw_line" => canvas.draw_line
       case _ => Canvas.default
     }
 
@@ -195,8 +196,52 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
       (canvas, Status(error = true, message = "Invalid number of arguments"))
     }
   }
-  gros caca
-
+  def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(x1Str, y1Str, x2Str, y2Str, color) => {
+        try {
+          val x1 = x1Str.toInt
+          val y1 = y1Str.toInt
+          val x2 = x2Str.toInt
+          val y2 = y2Str.toInt
+          var newCanvas = canvas
+          if (x1 == x2) {
+            // Vertical line
+            val yStart = Math.min(y1, y2)
+            val yEnd = Math.max(y1, y2)
+            for (y <- yStart to yEnd) {
+              val args = Seq(x1.toString, y.toString, color)
+              val (updatedCanvas, status) = newCanvas.update_pixel(args, newCanvas)
+              if (status.error) {
+                return (updatedCanvas, status)
+              }
+              newCanvas = updatedCanvas
+            }
+          } else if (y1 == y2) {
+            // Horizontal line
+            val xStart = Math.min(x1, x2)
+            val xEnd = Math.max(x1, x2)
+            for (x <- xStart to xEnd) {
+              val args = Seq(x.toString, y1.toString, color)
+              val (updatedCanvas, status) = newCanvas.update_pixel(args, newCanvas)
+              if (status.error) {
+                return (updatedCanvas, status)
+              }
+              newCanvas = updatedCanvas
+            }
+          } else {
+            return (canvas, Status(error = true, message = "Only horizontal and vertical lines are supported."))
+          }
+          (newCanvas, Status())
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+        }
+      }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments"))
+    }
+  }
 
 }
 
