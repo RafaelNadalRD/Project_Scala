@@ -17,3 +17,11 @@ Ensuite, la largeur, la hauteur et le caractère par défaut pour les pixels son
 On crée alors une nouvelle Vector de Pixels en utilisant la méthode fill de la classe Vector. Cette méthode permet de remplir une Vector avec des éléments générés par une fonction donnée. Ici, on génère une Vector de taille height, où chaque élément est une Vector de taille width, et où chaque élément est un Pixel initialisé avec les valeurs x=0, y=0 et le caractère par défaut.
 On copie ensuite la Canvas passée en paramètre en modifiant sa largeur, hauteur et pixels avec les valeurs calculées précédemment.
 Finalement, la nouvelle Canvas ainsi créée est renvoyée avec un Statut vide, qui indique que tout s'est bien passé.
+
+Draw_line:
+
+La fonction vérifie d'abord si la ligne est horizontale ou verticale. Si la ligne est horizontale (les coordonnées y sont égales), elle parcourt les coordonnées x entre le premier et le second point et met à jour la couleur de chaque pixel en utilisant la fonction update_pixel.
+
+Si la ligne est verticale (les coordonnées x sont égales), elle parcourt les coordonnées y entre le premier et le second point et met également à jour la couleur de chaque pixel en utilisant la fonction update_pixel.
+
+Si la ligne n'est ni horizontale ni verticale, la fonction renvoie un message d'erreur indiquant que seules les lignes horizontales et verticales sont prises en charge.
