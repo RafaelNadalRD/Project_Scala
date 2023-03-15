@@ -21,10 +21,16 @@ object Main extends App {
   def run(canvas: Canvas = Canvas()): Status = {
     println("\n======\nCanvas:")
     canvas.display
-
+    
+    print("\n'help' for more info")
+  
     print("\nAction: ")
 
+    
+
     val action = scala.io.StdIn.readLine()
+
+    
 
     val (newCanvas, status) = execute(ArraySeq.unsafeWrapArray(action.split(' ')), canvas)
 
@@ -48,6 +54,7 @@ object Main extends App {
       case "dummy" => Canvas.dummy
       case "dummy2" => Canvas.dummy2
       // TODO: Add command here
+      case "help" => help
       
 
       case "update pixel" => canvas.update_pixel
@@ -62,6 +69,38 @@ object Main extends App {
     }
 
     execution(action.tail, canvas)
+  }
+
+    /**
+   * List all the available commands
+   */
+    def help(args: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    val commands = Seq(
+      "exit" -> "Exit the application",
+      "dummy" -> "Dummy command for testing purposes",
+      "dummy2" -> "Dummy command for testing purposes",
+      "update_pixel" -> "Updates the color of a pixel based on his coordinates\nSyntaxe: 'update_pixel x,y color' ",
+      "load_image" -> "Load an image from a file into the canvas\nSyntaxe: 'load_image imageName'",
+      "new_canvas" -> "Create a new canvas\nSyntaxe: 'new_canvas width height character'",
+      "draw_line" -> "Draw a vertical or horizontal line between two pixels\nSyntaxe: 'draw_line x1,y1 x2,y2 color'",
+      "draw_line2" -> "Draw a line decreasing to the right between two pixels\nSyntaxe: 'draw_line2 x1,y1 x2,y2 color'",
+      "draw_line3" -> "Draw a line between two pixels\nSyntaxe: 'draw_line3 x1,y1 x2,y2 color'",
+      "draw_triangle" -> "Draw a triangle between three pixels\nSyntaxe: 'draw_triangle x1,y1 x2,y2 x3,y3 color'",
+      "draw_polygon" -> "Draw a polygon between multiple pixels\nSyntaxe: 'draw_polygon x1,y1 x2,y2 ... xn,yn color'"
+    )
+
+    if (args.length == 2 && args(1) == "--info") {
+      commands.find(_._1 == args(0)) match {
+        case Some((command, info)) => println(s"\n${command.capitalize}: $info")
+        case None => println(s"\nUnknown command: ${args(0)}")
+      }
+    } else {
+      println("\n======\nHere is the list of all available commands:\n")
+      commands.foreach { case (command, _) => println(command) }
+      println("\nPlease, if you want more information about a command, write the help commande followed by the name of the command '--info' \nFor example: 'help exit --info'")
+    }
+
+    (canvas, Status())
   }
 
 
