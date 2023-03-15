@@ -55,6 +55,7 @@ object Main extends App {
       case "new_canvas" => canvas.new_canvas
       case "Draw_line" => canvas.draw_line
       case "Draw_line2" => canvas.draw_line2
+      case "Draw_line3" => canvas.draw_line3
       case _ => Canvas.default
     }
 
@@ -276,6 +277,69 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
             D = D + 2 * dy
           }
           
+          (newCanvas, Status())
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+        }
+      }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments"))
+    }
+  }
+  def draw_line3(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(x1Str, y1Str, x2Str, y2Str, color) => {
+        try {
+          var x1 = x1Str.toInt
+          var y1 = y1Str.toInt
+          var x2 = x2Str.toInt
+          var y2 = y2Str.toInt
+
+          val steep = math.abs(y2 - y1) > math.abs(x2 - x1)
+          if (steep) {
+            var tmp = x1
+            x1 = y1
+            y1 = tmp
+            tmp = x2
+            x2 = y2
+            y2 = tmp
+          }
+
+          if (x1 > x2) {
+            var tmp = x1
+            x1 = x2
+            x2 = tmp
+            tmp = y1
+            y1 = y2
+            y2 = tmp
+          }
+          val dx = x2 - x1
+          val dy = math.abs(y2 - y1)
+          var error = dx / 2
+          val yStep = if (y1 < y2) 1 else -1
+          var y = y1
+
+          var newCanvas = canvas
+
+          for (x <- x1 to x2) {
+            val args = if (steep) Seq(y.toString, x.toString, color)
+                      else Seq(x.toString, y.toString, color)
+
+            val (updatedCanvas, status) = newCanvas.update_pixel(args, newCanvas)
+            if (status.error) {
+              return (updatedCanvas, status)
+            } else {
+              newCanvas = updatedCanvas
+            }
+
+            error -= dy
+            if (error < 0) {
+              y += yStep
+              error += dx
+            }
+          }
+
           (newCanvas, Status())
         } catch {
           case e: Exception =>
