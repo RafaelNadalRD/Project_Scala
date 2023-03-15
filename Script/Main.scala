@@ -57,6 +57,7 @@ object Main extends App {
       case "Draw_line2" => canvas.draw_line2
       case "Draw_line3" => canvas.draw_line3
       case "Draw_Triangle" => canvas.drawTriangle
+      case "Draw_Polygon" => canvas.drawPolygon
       case _ => Canvas.default
     }
 
@@ -384,6 +385,37 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
         (canvas, Status(error = true, message = "Invalid number of arguments"))
     }
   }
+  def drawPolygon(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    val color = arguments.last
+    val points = arguments.dropRight(1)
+    
+    if (points.length < 3) {
+      return (canvas, Status(error = true, message = "Invalid number of arguments, must have at least 3 points"))
+    }
+    
+    try {
+      def drawEdges(p1Str: String, p2Str: String, canvas: Canvas): (Canvas, Status) = {
+        val p1 = p1Str.split(",")
+        val p2 = p2Str.split(",")
+
+        draw_line3(Seq(p1(0), p1(1), p2(0), p2(1), color), canvas)
+      }
+
+      val initialCanvasStatus: (Canvas, Status) = (canvas, Status())
+      val (finalCanvas, finalStatus) = points.zip(points.tail :+ points.head).foldLeft(initialCanvasStatus) {
+        case ((currentCanvas, currentStatus), (p1, p2)) =>
+          if (currentStatus.error) (currentCanvas, currentStatus)
+          else drawEdges(p1, p2, currentCanvas)
+      }
+
+      (finalCanvas, finalStatus)
+    } catch {
+      case e: Exception =>
+        (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+    }
+  }
+
+
 
 }
 
