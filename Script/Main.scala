@@ -80,7 +80,7 @@ object Main extends App {
       "dummy" -> "Dummy command for testing purposes",
       "dummy2" -> "Dummy command for testing purposes",
       "update_pixel" -> "Updates the color of a pixel based on his coordinates\nSyntaxe: 'update_pixel x,y color' ",
-      "load_image" -> "Load an image from a file into the canvas\nSyntaxe: 'load_image imageName'",
+      "load_image" -> "Load an image from a file into the canvas\nSyntaxe: 'load_image imageName'\nHere, are the availables images:\ntriforce\nscala",
       "new_canvas" -> "Create a new canvas\nSyntaxe: 'new_canvas width height character'",
       "draw_line" -> "Draw a vertical or horizontal line between two pixels\nSyntaxe: 'draw_line x1,y1 x2,y2 color'",
       "draw_line2" -> "Draw a line decreasing to the right between two pixels\nSyntaxe: 'draw_line2 x1,y1 x2,y2 color'",
