@@ -50,14 +50,14 @@ object Main extends App {
       // TODO: Add command here
       
 
-      case "update_pixel" => canvas.update_pixel
-      case "load_image" => Canvas.load_image
-      case "new_canvas" => canvas.new_canvas
-      case "Draw_line" => canvas.draw_line
-      case "Draw_line2" => canvas.draw_line2
-      case "Draw_line3" => canvas.draw_line3
-      case "Draw_Triangle" => canvas.drawTriangle
-      case "Draw_Polygon" => canvas.drawPolygon
+      case "update pixel" => canvas.update_pixel
+      case "load image" => Canvas.load_image
+      case "new canvas" => canvas.new_canvas
+      case "draw line" => canvas.draw_line
+      case "draw line2" => canvas.draw_line2
+      case "draw line3" => canvas.draw_line3
+      case "draw triangle" => canvas.drawTriangle
+      case "draw polygon" => canvas.drawPolygon
       case _ => Canvas.default
     }
 
