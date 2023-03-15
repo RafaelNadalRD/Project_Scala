@@ -57,14 +57,14 @@ object Main extends App {
       case "help" => help
       
 
-      case "update pixel" => canvas.update_pixel
-      case "load image" => Canvas.load_image
-      case "new canvas" => canvas.new_canvas
-      case "draw line" => canvas.draw_line
-      case "draw line2" => canvas.draw_line2
-      case "draw line3" => canvas.draw_line3
-      case "draw triangle" => canvas.drawTriangle
-      case "draw polygon" => canvas.drawPolygon
+      case "update_pixel" => canvas.update_pixel
+      case "load_image" => Canvas.load_image
+      case "new_canvas" => canvas.new_canvas
+      case "draw_line" => canvas.draw_line
+      case "draw_line2" => canvas.draw_line2
+      case "draw_line3" => canvas.draw_line3
+      case "draw_triangle" => canvas.drawTriangle
+      case "draw_polygon" => canvas.drawPolygon
       case _ => Canvas.default
     }
 
@@ -241,12 +241,14 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
   }
   def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
-      case Seq(x1Str, y1Str, x2Str, y2Str, color) => {
+      case Seq(p1Str, p2Str, color) => {
         try {
-          val x1 = x1Str.toInt
-          val y1 = y1Str.toInt
-          val x2 = x2Str.toInt
-          val y2 = y2Str.toInt
+          val p1 = p1Str.split(",")
+          val p2 = p2Str.split(",")
+          val x1 = p1(0).toInt
+          val y1 = p1(1).toInt
+          val x2 = p2(0).toInt
+          val y2 = p2(1).toInt
           var newCanvas = canvas
           if (x1 == x2) {
             // Vertical line
@@ -288,12 +290,14 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
 
   def draw_line2(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
-      case Seq(x1Str, y1Str, x2Str, y2Str, color) => {
+      case Seq(p1Str, p2Str, color) => {
         try {
-          val x1 = x1Str.toInt
-          val y1 = y1Str.toInt
-          val x2 = x2Str.toInt
-          val y2 = y2Str.toInt
+          val p1 = p1Str.split(",")
+          val p2 = p2Str.split(",")
+          val x1 = p1(0).toInt
+          val y1 = p1(1).toInt
+          val x2 = p2(0).toInt
+          val y2 = p2(1).toInt
 
           val dx = x2 - x1
           val dy = y2 - y1
@@ -330,12 +334,14 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
   }
   def draw_line3(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
-      case Seq(x1Str, y1Str, x2Str, y2Str, color) => {
+      case Seq(p1Str, p2Str, color) => {
         try {
-          var x1 = x1Str.toInt
-          var y1 = y1Str.toInt
-          var x2 = x2Str.toInt
-          var y2 = y2Str.toInt
+          val p1 = p1Str.split(",")
+          val p2 = p2Str.split(",")
+          var x1 = p1(0).toInt
+          var y1 = p1(1).toInt
+          var x2 = p2(0).toInt
+          var y2 = p2(1).toInt
 
           val steep = math.abs(y2 - y1) > math.abs(x2 - x1)
           if (steep) {
