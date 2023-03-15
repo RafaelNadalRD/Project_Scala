@@ -56,6 +56,7 @@ object Main extends App {
       case "Draw_line" => canvas.draw_line
       case "Draw_line2" => canvas.draw_line2
       case "Draw_line3" => canvas.draw_line3
+      case "Draw_Triangle" => canvas.drawTriangle
       case _ => Canvas.default
     }
 
@@ -341,6 +342,39 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           }
 
           (newCanvas, Status())
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+        }
+      }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments"))
+    }
+  }
+  def drawTriangle(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(p1Str, p2Str, p3Str, color) => {
+        try {
+          val p1 = p1Str.split(",")
+          val p2 = p2Str.split(",")
+          val p3 = p3Str.split(",")
+
+          val (canvas1, status1) = draw_line3(Seq(p1(0), p1(1), p2(0), p2(1), color), canvas)
+          if (status1.error) {
+            return (canvas1, status1)
+          }
+
+          val (canvas2, status2) = draw_line3(Seq(p2(0), p2(1), p3(0), p3(1), color), canvas1)
+          if (status2.error) {
+            return (canvas2, status2)
+          }
+
+          val (canvas3, status3) = draw_line3(Seq(p3(0), p3(1), p1(0), p1(1), color), canvas2)
+          if (status3.error) {
+            return (canvas3, status3)
+          }
+
+          (canvas3, Status())
         } catch {
           case e: Exception =>
             (canvas, Status(error = true, message = s"Invalid arguments: $e"))
