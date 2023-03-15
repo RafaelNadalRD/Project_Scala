@@ -30,6 +30,11 @@ object Main extends App {
 
     val action = scala.io.StdIn.readLine()
 
+    //Effacer les anciens textes
+    // print("\u001b[H\u001b[2J")
+    print("\u001b[2J\u001b[;H")
+
+
     
 
     val (newCanvas, status) = execute(ArraySeq.unsafeWrapArray(action.split(' ')), canvas)
@@ -58,7 +63,7 @@ object Main extends App {
       
 
       case "update_pixel" => canvas.update_pixel
-      case "load_image" => Canvas.load_image
+      case "load_image" => canvas.load_image
       case "new_canvas" => canvas.new_canvas
       case "draw_line" => canvas.draw_line
       case "draw_line2" => canvas.draw_line2
@@ -79,7 +84,7 @@ object Main extends App {
       "exit" -> "Exit the application",
       "dummy" -> "Dummy command for testing purposes",
       "dummy2" -> "Dummy command for testing purposes",
-      "update_pixel" -> "Updates the color of a pixel based on his coordinates\nSyntaxe: 'update_pixel x,y color' ",
+      "update_pixel" -> "Updates the color of a pixel based on his coordinates\nSyntaxe: 'update_pixel x y color' ",
       "load_image" -> "Load an image from a file into the canvas\nSyntaxe: 'load_image imageName'\nHere, are the availables images:\ntriforce\nscala",
       "new_canvas" -> "Create a new canvas\nSyntaxe: 'new_canvas width height character'",
       "draw_line" -> "Draw a vertical or horizontal line between two pixels\nSyntaxe: 'draw_line x1,y1 x2,y2 color'",
@@ -217,7 +222,35 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
       (canvas, Status(error = true, message = "Invalid number of arguments"))
   }
 
- /**
+  /**
+   * Load image from file to create a canvas
+   */
+  def load_image(action: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    val fileName = action.head
+    
+    val path = s"../Utilities/$fileName"
+    
+    val status = Status()
+    val fileContent = try {
+      Source.fromFile(path).getLines().toVector
+    } catch {
+      case e: Exception =>
+        return (canvas, status.copy(error = true, message = s"Failed to read file '$fileName'"))
+    }
+    
+    if (fileContent.isEmpty) {
+      return (canvas, status.copy(error = true, message = s"File '$fileName' is empty"))
+    }
+
+    // Create a new canvas from the file content
+    val pixels = fileContent.map(_.toCharArray).map(_.toVector).map(row => row.map(c => Pixel(0, 0, c)))
+    val newCanvas = canvas.copy(width = pixels(0).length, height = pixels.length, pixels = pixels)
+    println(s"Loaded image from file '$fileName'")
+    (newCanvas, status)
+  }
+
+
+  /**
   * Update a pixel based on his coordinates 
   */
 
@@ -522,34 +555,6 @@ object Canvas {
   // TODO: Add any useful method
 
   /////OUR CODE//////
-
-  /**
-   * Load image from file to create a canvas
-   */
-  def load_image(action: Seq[String], canvas: Canvas): (Canvas, Status) = {
-    val fileName = action.head
-    
-    val path = s"../Utilities/$fileName"
-    
-    val status = Status()
-    val fileContent = try {
-      Source.fromFile(path).getLines().toVector
-    } catch {
-      case e: Exception =>
-        return (canvas, status.copy(error = true, message = s"Failed to read file '$fileName'"))
-    }
-    
-    if (fileContent.isEmpty) {
-      return (canvas, status.copy(error = true, message = s"File '$fileName' is empty"))
-    }
-
-    // Create a new canvas from the file content
-    val pixels = fileContent.map(_.toCharArray).map(_.toVector).map(row => row.map(c => Pixel(0, 0, c)))
-    val newCanvas = canvas.copy(width = pixels(0).length, height = pixels.length, pixels = pixels)
-    println(s"Loaded image from file '$fileName'")
-    (newCanvas, status)
-  }
-
   
 }
 
