@@ -202,7 +202,7 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
   }
   def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
-      case Seq(p1Str, p2Str, color) => {
+      case Seq(p1Str, p2Str, color) =>
         try {
           val p1 = p1Str.split(",")
           val p2 = p2Str.split(",")
@@ -210,48 +210,43 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           val y1 = p1(1).toInt
           val x2 = p2(0).toInt
           val y2 = p2(1).toInt
-          var newCanvas = canvas
+
           if (x1 == x2) {
             // Vertical line
             val yStart = Math.min(y1, y2)
             val yEnd = Math.max(y1, y2)
-            for (y <- yStart to yEnd) {
+            val newCanvas = (yStart to yEnd).foldLeft(canvas) { (currentCanvas, y) =>
               val args = Seq(x1.toString, y.toString, color)
-              val (updatedCanvas, status) = newCanvas.update_pixel(args, newCanvas)
-              if (status.error) {
-                return (updatedCanvas, status)
-              }
-              newCanvas = updatedCanvas
+              val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
+              if (status.error) return (updatedCanvas, status)
+              updatedCanvas
             }
+            (newCanvas, Status())
           } else if (y1 == y2) {
             // Horizontal line
             val xStart = Math.min(x1, x2)
             val xEnd = Math.max(x1, x2)
-            for (x <- xStart to xEnd) {
+            val newCanvas = (xStart to xEnd).foldLeft(canvas) { (currentCanvas, x) =>
               val args = Seq(x.toString, y1.toString, color)
-              val (updatedCanvas, status) = newCanvas.update_pixel(args, newCanvas)
-              if (status.error) {
-                return (updatedCanvas, status)
-              }
-              newCanvas = updatedCanvas
+              val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
+              if (status.error) return (updatedCanvas, status)
+              updatedCanvas
             }
+            (newCanvas, Status())
           } else {
-            return (canvas, Status(error = true, message = "Only horizontal and vertical lines are supported."))
+            (canvas, Status(error = true, message = "Only horizontal and vertical lines are supported."))
           }
-          (newCanvas, Status())
         } catch {
           case e: Exception =>
             (canvas, Status(error = true, message = s"Invalid arguments: $e"))
         }
-      }
       case _ =>
         (canvas, Status(error = true, message = "Invalid number of arguments"))
     }
   }
-
   def draw_line2(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
-      case Seq(p1Str, p2Str, color) => {
+      case Seq(p1Str, p2Str, color) =>
         try {
           val p1 = p1Str.split(",")
           val p2 = p2Str.split(",")
@@ -262,90 +257,64 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
 
           val dx = x2 - x1
           val dy = y2 - y1
-          var D = 2 * dy - dx
-          var y = y1
+          val initialD = 2 * dy - dx
 
-          var newCanvas = canvas
+          val (_, newCanvas, _) = (x1 to x2).foldLeft((y1, canvas, initialD)) {
+            case ((y, currentCanvas, d), x) =>
+              val args = Seq(x.toString, y.toString, color)
+              val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
+              if (status.error) return (updatedCanvas, status)
 
-          for (x <- x1 to x2) {
-            val args = Seq(x.toString, y.toString, color)
-            val (updatedCanvas, status) = newCanvas.update_pixel(args, newCanvas)
-            if (status.error) {
-              return (updatedCanvas, status)
-            } else {
-              newCanvas = updatedCanvas
-            }
+              val newY = if (d > 0) y + 1 else y
+              val newD = if (d > 0) d - 2 * dx else d
 
-            if (D > 0) {
-              y = y + 1
-              D = D - 2 * dx
-            }
-            D = D + 2 * dy
+              (newY, updatedCanvas, newD + 2 * dy)
           }
-          
           (newCanvas, Status())
         } catch {
           case e: Exception =>
             (canvas, Status(error = true, message = s"Invalid arguments: $e"))
         }
-      }
       case _ =>
         (canvas, Status(error = true, message = "Invalid number of arguments"))
     }
   }
   def draw_line3(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
-      case Seq(p1Str, p2Str, color) => {
+      case Seq(p1Str, p2Str, color) =>
         try {
           val p1 = p1Str.split(",")
           val p2 = p2Str.split(",")
-          var x1 = p1(0).toInt
-          var y1 = p1(1).toInt
-          var x2 = p2(0).toInt
-          var y2 = p2(1).toInt
+          val x1 = p1(0).toInt
+          val y1 = p1(1).toInt
+          val x2 = p2(0).toInt
+          val y2 = p2(1).toInt
 
           val steep = math.abs(y2 - y1) > math.abs(x2 - x1)
-          if (steep) {
-            var tmp = x1
-            x1 = y1
-            y1 = tmp
-            tmp = x2
-            x2 = y2
-            y2 = tmp
-          }
+          val (startX, startY) = if (steep) (y1, x1) else (x1, y1)
+          val (endX, endY) = if (steep) (y2, x2) else (x2, y2)
 
-          if (x1 > x2) {
-            var tmp = x1
-            x1 = x2
-            x2 = tmp
-            tmp = y1
-            y1 = y2
-            y2 = tmp
-          }
-          val dx = x2 - x1
-          val dy = math.abs(y2 - y1)
-          var error = dx / 2
-          val yStep = if (y1 < y2) 1 else -1
-          var y = y1
+          val (minX, minY, maxX, maxY) = if (startX > endX) (endX, endY, startX, startY) else (startX, startY, endX, endY)
 
-          var newCanvas = canvas
+          val dx = maxX - minX
+          val dy = math.abs(maxY - minY)
+          val yStep = if (minY < maxY) 1 else -1
 
-          for (x <- x1 to x2) {
-            val args = if (steep) Seq(y.toString, x.toString, color)
-                      else Seq(x.toString, y.toString, color)
+          val initialError = dx / 2
 
-            val (updatedCanvas, status) = newCanvas.update_pixel(args, newCanvas)
-            if (status.error) {
-              return (updatedCanvas, status)
-            } else {
-              newCanvas = updatedCanvas
-            }
+          val (_, newCanvas, _) = (minX to maxX).foldLeft((minY, canvas, initialError)) {
+            case ((y, currentCanvas, error), x) =>
+              val args = if (steep) Seq(y.toString, x.toString, color)
+              else Seq(x.toString, y.toString, color)
 
-            error -= dy
-            if (error < 0) {
-              y += yStep
-              error += dx
-            }
+              val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
+              if (status.error) return (updatedCanvas, status)
+
+              val newError = error - dy
+              val newY = if (newError < 0) y + yStep else y
+              val updatedError = if (newError < 0) newError + dx else newError
+
+              (newY, updatedCanvas, updatedError)
           }
 
           (newCanvas, Status())
@@ -353,7 +322,6 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           case e: Exception =>
             (canvas, Status(error = true, message = s"Invalid arguments: $e"))
         }
-      }
       case _ =>
         (canvas, Status(error = true, message = "Invalid number of arguments"))
     }
