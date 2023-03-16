@@ -332,26 +332,34 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
         val x = xStr.toInt
         val y = yStr.toInt
 
-        val targetColor = canvas.getPixelColor(x, y)
+        val targetColor = canvas.getPixel(x, y).color
         if (targetColor == color) {
           return (canvas, Status())
         }
 
         val newCanvas = canvas.copy()
-        val q = Queue((x, y))
 
-        while (q.nonEmpty) {
-          val (currentX, currentY) = q.dequeue()
-          if (newCanvas.isInBounds(currentX, currentY) && newCanvas.getPixelColor(currentX, currentY) == targetColor) {
-            newCanvas.setPixelColor(currentX, currentY, color)
+        def isInBounds(x: Int, y: Int): Boolean = {
+          x >= 0 && x < canvas.width && y >= 0 && y < canvas.height
+        }
 
-            q.enqueue((currentX - 1, currentY))
-            q.enqueue((currentX + 1, currentY))
-            q.enqueue((currentX, currentY - 1))
-            q.enqueue((currentX, currentY + 1))
+        def fillQueue(queue: Queue[(Int, Int)]): Unit = {
+          if (queue.isEmpty) return
+
+          val (currentX, currentY) = queue.dequeue()
+          if (isInBounds(currentX, currentY) && newCanvas.getPixel(currentX, currentY).color == targetColor) {
+            newCanvas.updatepixel(Seq(currentX.toString, currentY.toString, color), newCanvas)
+
+            fillQueue(queue.enqueue((currentX - 1, currentY)))
+            fillQueue(queue.enqueue((currentX + 1, currentY)))
+            fillQueue(queue.enqueue((currentX, currentY - 1)))
+            fillQueue(queue.enqueue((currentX, currentY + 1)))
+          } else {
+            fillQueue(queue)
           }
         }
 
+        fillQueue(Queue((x, y)))
         (newCanvas, Status())
       } catch {
         case e: Exception =>
