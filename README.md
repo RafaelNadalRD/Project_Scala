@@ -235,8 +235,38 @@ De manière générale, cette méthode est la première version du dessin de lig
 ### Exercice 2-D
 
 ```scala
-
+  def draw_rectangle(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(x1y1Str, x2y2Str, color) =>
+        try {
+          val x1y1 = x1y1Str.split(",").map(_.toInt)
+          val x2y2 = x2y2Str.split(",").map(_.toInt)
+          val x1 = x1y1(0).toString()
+          val y1 = x1y1(1).toString()
+          val x2 = x2y2(0).toString()
+          val y2 = x2y2(1).toString()
+          val (newCanvas1, status1) = draw_line(Seq(x1.concat(",").concat(y1),x2.concat(",").concat(y1), color), canvas)
+          val (newCanvas2, status2) = draw_line(Seq(x2.concat(",").concat(y1),x2.concat(",").concat(y2), color), newCanvas1)
+          val (newCanvas3, status3) = draw_line(Seq(x2.concat(",").concat(y2),x1.concat(",").concat(y2), color), newCanvas2)
+          val (newCanvas4, status4) = draw_line(Seq(x1.concat(",").concat(y2),x1.concat(",").concat(y1), color), newCanvas3)
+          (newCanvas4, Status())
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+        }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments"))
+    }
+  }
 ```
+
+Cette méthode, draw_rectangle, dessine un rectangle sur le Canvas. Elle prend deux arguments sous forme de chaînes de caractères : x1y1Str, x2y2Str qui représentent les coordonnées de deux coins opposés du rectangle, et une chaîne color qui représente la couleur du rectangle.
+
+Elle commence par vérifier que les arguments sont valides en essayant de les convertir en nombres entiers avec la méthode toInt. Si cela échoue, elle renvoie un message d'erreur.
+
+Ensuite, elle divise le rectangle en quatre côtés et dessine chaque côté à l'aide de la méthode draw_line. Elle récupère le nouveau Canvas retourné par chaque appel à draw_line et le passe comme argument à l'appel suivant. Finalement, elle renvoie le Canvas mis à jour et une Status vide.
+
+Si les arguments ne sont pas au bon format ou si leur nombre est incorrect, elle renvoie un message d'erreur dans Status et renvoie le Canvas inchangé.
 
 ### Exercice 2-E
 
