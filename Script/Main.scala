@@ -351,40 +351,6 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
         (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_line x1,y1 x2,y2 color"))
     }
   }
-
-  def fill(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
-  arguments match {
-    case Seq(xStr, yStr, color) =>
-      try {
-        val x = xStr.toInt
-        val y = yStr.toInt
-        val originalColor = canvas.getPixel(x, y)
-        var newCanvas = canvas.update_pixel(Seq(x.toString, y.toString, color), canvas)._1
-        val visited = mutable.Set[(Int, Int)]((x, y))
-
-        def fillHelper(x: Int, y: Int): Unit = {
-          val neighbors = Seq((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1))
-          for ((nx, ny) <- neighbors) {
-            if (nx >= 0 && ny >= 0 && nx < canvas.width && ny < canvas.height && canvas.get_pixel(nx, ny) == originalColor && !visited.contains((nx, ny))) {
-              visited.add((nx, ny))
-              newCanvas = newCanvas.update_pixel(Seq(nx.toString, ny.toString, color), newCanvas)._1
-              fillHelper(nx, ny)
-            }
-          }
-        }
-
-        fillHelper(x, y)
-        (newCanvas, Status())
-      } catch {
-        case e: Exception =>
-          (canvas, Status(error = true, message = s"Invalid arguments: $e"))
-      }
-    case _ =>
-      (canvas, Status(error = true, message = "Invalid number of arguments"))
-  }
-}
-
-
   def draw_line2(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
       case Seq(p1Str, p2Str, color) => {
