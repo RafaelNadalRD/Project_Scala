@@ -33,7 +33,7 @@ object Main extends App {
 
     //Effacer les anciens textes
     // print("\u001b[H\u001b[2J")
-    print("\u001b[2J\u001b[;H")
+    // print("\u001b[2J\u001b[;H")
 
 
     
@@ -93,6 +93,7 @@ object Main extends App {
       "draw_line2" -> "Draw a line decreasing to the right between two pixels\nSyntaxe: 'draw_line2 x1,y1 x2,y2 color'",
       "draw_line3" -> "Draw a line between two pixels\nSyntaxe: 'draw_line3 x1,y1 x2,y2 color'",
       "draw_triangle" -> "Draw a triangle between three pixels\nSyntaxe: 'draw_triangle x1,y1 x2,y2 x3,y3 color'",
+      "draw_rectangle" -> "Draw a rectangle between both top left and bottom right corners\nSyntaxe: draw_rectangle x1,y1 x2,y2 color",
       "draw_polygon" -> "Draw a polygon between multiple pixels\nSyntaxe: 'draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color'"
     )
 
@@ -527,9 +528,6 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
         (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color"))
     }
   }
-
-
-
 }
 
 /**
