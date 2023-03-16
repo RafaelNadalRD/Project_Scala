@@ -189,6 +189,28 @@ Nous aurions pu faire le choix d'incrémenter de 1 les coordonnées pour se rapp
 
 ### Exercice 2-E
 
+```scala
+
+```
+
+### Exercice 2-F
+
+```scala
+
+```
+
+### Exercice 2-G
+
+```scala
+
+```
+
+### Exercice 2-H
+
+```scala
+
+```
+
 
 
 
