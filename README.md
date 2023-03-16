@@ -178,8 +178,59 @@ Nous aurions pu faire le choix d'incrémenter de 1 les coordonnées pour se rapp
 ### Exercice 2-C
 
 ```scala
+def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(p1Str, p2Str, color) =>
+        try {
+          val p1 = p1Str.split(",")
+          val p2 = p2Str.split(",")
+          val x1 = p1(0).toInt
+          val y1 = p1(1).toInt
+          val x2 = p2(0).toInt
+          val y2 = p2(1).toInt
 
+          if (x1 == x2) {
+            // Vertical line
+            val yStart = Math.min(y1, y2)
+            val yEnd = Math.max(y1, y2)
+            val newCanvas = (yStart to yEnd).foldLeft(canvas) { (currentCanvas, y) =>
+              val args = Seq(x1.toString, y.toString, color)
+              val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
+              if (status.error) return (updatedCanvas, status)
+              updatedCanvas
+            }
+            (newCanvas, Status())
+          } else if (y1 == y2) {
+            // Horizontal line
+            val xStart = Math.min(x1, x2)
+            val xEnd = Math.max(x1, x2)
+            val newCanvas = (xStart to xEnd).foldLeft(canvas) { (currentCanvas, x) =>
+              val args = Seq(x.toString, y1.toString, color)
+              val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
+              if (status.error) return (updatedCanvas, status)
+              updatedCanvas
+            }
+            (newCanvas, Status())
+          } else {
+            (canvas, Status(error = true, message = "Only horizontal and vertical lines are supported."))
+          }
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+        }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments"))
+    }
+  }
 ```
+La méthode draw_line permet de dessiner une ligne sur la Canvas en utilisant la méthode update_pixel. Les arguments passés à la méthode sont une séquence de trois chaînes de caractères : les coordonnées de deux points (p1 et p2) et la couleur de la ligne. La méthode commence par extraire les coordonnées des deux points et les convertir en entiers.
+
+Ensuite, elle vérifie si la ligne est verticale ou horizontale en comparant les valeurs x et y des deux points. Si la ligne est verticale, elle parcourt les pixels un par un dans la colonne x et entre les deux valeurs y de p1 et p2 en appelant la méthode update_pixel pour mettre à jour la couleur de chaque pixel. Si la ligne est horizontale, elle parcourt les pixels un par un dans la ligne y et entre les deux valeurs x de p1 et p2. Dans les deux cas, si une erreur se produit lors de l'appel de update_pixel, la méthode retourne une erreur.
+
+Si la ligne n'est ni horizontale ni verticale, la méthode retourne une erreur. Enfin, si le nombre d'arguments est incorrect, elle retourne également une erreur. Enfin, la méthode renvoie le nouveau Canvas et l'état (Status) de l'opération.
+
+De manière générale, cette méthode est la première version du dessin de ligne et n'est volontairement pas capable de faire plus que dessiner des lignes verticales et horizontales
+
 
 ### Exercice 2-D
 
