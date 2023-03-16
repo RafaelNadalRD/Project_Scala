@@ -1,11 +1,37 @@
 # Project_Scala
-Le projet du S1
+Projet SCALA réalisé par Collas Pierre , Novaretti Rémy , Delers Remi
+
+___
+
+# Sommaire
+1. [Compilation du projet](#compilation-du-projet)
+2. [Explication du code](#explication-du-code)
+	1. [Exercice 1-B](#exercice-1-b)
+	2. [Exercice 1-C](#exercice-1-c)
+	3. [Exercice 1-D](#exercice-1-d)
+	4. [Exercice 2-A](#exercice-2-a)
+	5. [Exercice 2-B](#exercice-2-b)
+	6. [Exercice 2-C](#exercice-2-c)
+	7. [Exercice 2-D](#exercice-2-d)
+	8. [Exercice 2-E](#exercice-2-e)
+	9. [Exercice 2-F](#exercice-2-f)
+	10. [Exercice 2-G](#exercice-2-g)
+	11. [Exercice 2-H](#exercice-2-h)
+	12. [appel des commandes](#appel-des-commandes)
+	13. [Méthode BONUS HELP](#méthode-bonus-help)
+3. [Partage des tâches](#partage-des-tâches)
+
+
+___
+
 
 
 ## Compilation du projet:
-- Déplacez vous dans le répertoire Script à l'aide de la commande "cd"
+- Déplacez-vous dans le répertoire Script à l'aide de la commande "cd"
 - Compilez le fichier Main.scala à l'aide de la commande "scalac Main.scala"
 - Executez le script à l'aide de la commande "scala Main"
+
+___
 
 
 ## Explication du code:
@@ -32,7 +58,7 @@ def display: Unit = {
     }
   }
 ```
-Pour réaliser cette exercice, nous avons ajouté un code qui parcourt les éléments du tableau en utilisant une boucle "for" imbriquée. Le premier "for" parcourt chaque ligne "row" du tableau "pixels" et le deuxième "for" parcourt chaque élément "pixel" de chaque ligne "row". Pour chaque élément "pixel", la méthode "print" est utilisée pour l'imprimer sur la même ligne sans saut de ligne. Après avoir parcouru tous les éléments d'une ligne, la méthode "println" est utilisée pour effectuer un saut de ligne et passer à la ligne suivante. Ce processus se répète pour chaque ligne du tableau, produisant ainsi une représentation visuelle de la matrice de pixels.
+Pour réaliser cet exercice, nous avons ajouté un code qui parcourt les éléments du tableau en utilisant une boucle "for" imbriquée. Le premier "for" parcourt chaque ligne "row" du tableau "pixels" et le deuxième "for" parcourt chaque élément "pixel" de chaque ligne "row". Pour chaque élément "pixel", la méthode "print" est utilisée pour l'imprimer sur la même ligne sans saut de ligne. Après avoir parcouru tous les éléments d'une ligne, la méthode "println" est utilisée pour effectuer un saut de ligne et passer à la ligne suivante. Ce processus se répète pour chaque ligne du tableau, produisant ainsi une représentation visuelle de la matrice de pixels.
 
 ### Exercice 1-C
 
@@ -60,7 +86,7 @@ object Pixel {
 
 ```
 
-Pour cet exercice nous avons amélioré la méthode "apply" quipeux maitenant extraient les valeurs de coordonnées x et y de la chaîne de caractères en utilisant la méthode "split" de Scala pour diviser la chaîne en deux parties. Puis convertit les chaînes de caractères résultantes en entiers en utilisant la méthode "toInt". Les valeurs de coordonnées x et y ainsi obtenues sont ensuite utilisées pour créer un objet "Pixel" valide.
+Pour cet exercice nous avons amélioré la méthode "apply" qui peux maitenant extraient les valeurs de coordonnées x et y de la chaîne de caractère en utilisant la méthode "split" de Scala pour diviser la chaîne en deux parties. Puis converti les chaînes de caractères résultantes en entiers en utilisant la méthode "toInt". Les valeurs de coordonnées x et y ainsi obtenues sont ensuite utilisées pour créer un objet "Pixel" valide.
 
 
 ### Exercice 1-D
@@ -194,7 +220,7 @@ def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
             val yStart = Math.min(y1, y2)
             val yEnd = Math.max(y1, y2)
             val newCanvas = (yStart to yEnd).foldLeft(canvas) { (currentCanvas, y) =>
-              val args = Seq(x1.toString, y.toString, color)
+              val args = Seq(s"$x1,$y", color)
               val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
               if (status.error) return (updatedCanvas, status)
               updatedCanvas
@@ -205,7 +231,7 @@ def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
             val xStart = Math.min(x1, x2)
             val xEnd = Math.max(x1, x2)
             val newCanvas = (xStart to xEnd).foldLeft(canvas) { (currentCanvas, x) =>
-              val args = Seq(x.toString, y1.toString, color)
+              val args = Seq(s"$x,$y1", color)
               val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
               if (status.error) return (updatedCanvas, status)
               updatedCanvas
@@ -216,12 +242,12 @@ def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
           }
         } catch {
           case e: Exception =>
-            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_line x1,y1 x2,y2 newColor"))
         }
       case _ =>
-        (canvas, Status(error = true, message = "Invalid number of arguments"))
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_line x1,y1 x2,y2 newColor"))
     }
-  }
+}
 ```
 La méthode draw_line permet de dessiner une ligne sur la Canvas en utilisant la méthode update_pixel. Les arguments passés à la méthode sont une séquence de trois chaînes de caractères : les coordonnées de deux points (p1 et p2) et la couleur de la ligne. La méthode commence par extraire les coordonnées des deux points et les convertir en entiers.
 
@@ -235,7 +261,7 @@ De manière générale, cette méthode est la première version du dessin de lig
 ### Exercice 2-D
 
 ```scala
-  def draw_rectangle(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+def draw_rectangle(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
       case Seq(x1y1Str, x2y2Str, color) =>
         try {
@@ -252,12 +278,12 @@ De manière générale, cette méthode est la première version du dessin de lig
           (newCanvas4, Status())
         } catch {
           case e: Exception =>
-            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_rectangle x1,y1 x2,y2 newColor"))
         }
       case _ =>
-        (canvas, Status(error = true, message = "Invalid number of arguments"))
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_rectangle x1,y1 x2,y2 newColor"))
     }
-  }
+}
 ```
 
 Cette méthode, draw_rectangle, dessine un rectangle sur le Canvas. Elle prend deux arguments sous forme de chaînes de caractères : x1y1Str, x2y2Str qui représentent les coordonnées de deux coins opposés du rectangle, et une chaîne color qui représente la couleur du rectangle.
@@ -277,14 +303,124 @@ Si les arguments ne sont pas au bon format ou si leur nombre est incorrect, elle
 ### Exercice 2-F
 
 ```scala
+  def draw_line2(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(p1Str, p2Str, color) =>
+        try {
+          val p1 = p1Str.split(",")
+          val p2 = p2Str.split(",")
+          val x1 = p1(0).toInt
+          val y1 = p1(1).toInt
+          val x2 = p2(0).toInt
+          val y2 = p2(1).toInt
 
+          val dx = x2 - x1
+          val dy = y2 - y1
+          val initialD = 2 * dy - dx
+
+          val (_, newCanvas, _) = (x1 to x2).foldLeft((y1, canvas, initialD)) {
+            case ((y, currentCanvas, d), x) =>
+              val args = Seq(s"$x,$y", color)
+              val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
+              if (status.error) return (updatedCanvas, status)
+
+              val newY = if (d > 0) y + 1 else y
+              val newD = if (d > 0) d - 2 * dx else d
+
+              (newY, updatedCanvas, newD + 2 * dy)
+          }
+          (newCanvas, Status())
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_line2 x1,y1 x2,y2 newColor"))
+        }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_line2 x1,y1 x2,y2 newColor"))
+    }
+  }
 ```
+
+Cette méthode est utilisée pour dessiner une ligne sur un canevas avec un algorithme appelé "algorithme de Bresenham".
+
+La méthode prend en entrée une séquence d'arguments contenant les coordonnées des deux points qui définissent la ligne et la couleur de la ligne, ainsi qu'un objet de type Canvas qui représente le canevas sur lequel la ligne sera dessinée. La méthode renvoie un tuple contenant le canevas mis à jour et un objet de type Status qui indique si l'opération s'est déroulée avec succès ou s'il y a eu une erreur.
+
+L'algorithme de Bresenham est un algorithme d'approximation qui permet de tracer une ligne en utilisant des pixels discrets. Il est utilisé ici pour dessiner la ligne pixel par pixel. L'algorithme utilise des calculs mathématiques pour déterminer les pixels à dessiner en fonction des coordonnées des deux points.
+
+Le code commence par extraire les coordonnées des deux points et la couleur de la ligne à partir des arguments passés à la méthode. Ensuite, l'algorithme calcule la différence en x et en y entre les deux points et détermine une valeur initiale pour le calcul de l'erreur.
+
+Le code utilise ensuite une boucle pour parcourir les pixels de la ligne de gauche à droite et détermine pour chaque pixel s'il doit être dessiné ou non en fonction de la valeur de l'erreur calculée précédemment. Si la valeur de l'erreur est positive, cela signifie que le prochain pixel à dessiner est au-dessus de la ligne, sinon il est en-dessous.
+
+La méthode met à jour le canevas à chaque fois qu'un pixel est dessiné en appelant la méthode "update_pixel" de l'objet Canvas. Si un problème survient lors du dessin, la méthode renvoie un objet de type Status indiquant une erreur.
+
+Finalement, la méthode renvoie le canevas mis à jour et un objet de type Status indiquant si l'opération s'est déroulée avec succès ou s'il y a eu une erreur.
+
+Notons que cette méthode est prévu pour fonctionner pour une ligne qui descent vers la droite.
 
 ### Exercice 2-G
 
 ```scala
+def draw_line3(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(p1Str, p2Str, color) =>
+        try {
+          val p1 = p1Str.split(",")
+          val p2 = p2Str.split(",")
+          val x1 = p1(0).toInt
+          val y1 = p1(1).toInt
+          val x2 = p2(0).toInt
+          val y2 = p2(1).toInt
 
+          val steep = math.abs(y2 - y1) > math.abs(x2 - x1)
+          val (startX, startY) = if (steep) (y1, x1) else (x1, y1)
+          val (endX, endY) = if (steep) (y2, x2) else (x2, y2)
+
+          val (minX, minY, maxX, maxY) = if (startX > endX) (endX, endY, startX, startY) else (startX, startY, endX, endY)
+
+          val dx = maxX - minX
+          val dy = math.abs(maxY - minY)
+          val yStep = if (minY < maxY) 1 else -1
+
+          val initialError = dx / 2
+
+          val (_, newCanvas, _) = (minX to maxX).foldLeft((minY, canvas, initialError)) {
+            case ((y, currentCanvas, error), x) =>
+              val args = if (steep) Seq(s"$y,$x", color)
+              else Seq(s"$x,$y", color)
+
+              val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
+              if (status.error) return (updatedCanvas, status)
+
+              val newError = error - dy
+              val newY = if (newError < 0) y + yStep else y
+              val updatedError = if (newError < 0) newError + dx else newError
+
+              (newY, updatedCanvas, updatedError)
+          }
+
+          (newCanvas, Status())
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_line3 x1,y1 x2,y2 newColor"))
+        }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_line x1,y1 x2,y2 newColor"))
+    }
+  }
 ```
+
+La méthode draw_line3 prend en entrée une liste d'arguments (sous forme de chaînes de caractères) et une instance de la classe Canvas, et renvoie une paire contenant une nouvelle instance de la classe Canvas et un objet Status.
+
+La méthode utilise également l'algorithme de Bresenham pour dessiner une ligne sur le canvas en utilisant les coordonnées de deux points et une couleur. 
+
+La méthode commence par extraire les coordonnées des deux points et la couleur à partir de la liste d'arguments. Elle convertit ensuite les coordonnées en nombres entiers. Les coordonnées sont ensuite transformées pour que le point de départ ait une coordonnée inférieure ou égale à celle du point d'arrivée, afin de simplifier le tracé de la ligne.
+
+Ensuite, la méthode détermine si la ligne est plus verticale ou plus horizontale. Si la ligne est plus verticale, les coordonnées x et y sont échangées. Cela permet de simplifier les calculs à venir.
+
+La méthode calcule ensuite les valeurs nécessaires à l'algorithme de Bresenham, notamment la distance entre les deux points, la direction de la ligne (vers le haut ou vers le bas), et une erreur initiale.
+
+La méthode utilise ensuite une boucle pour dessiner la ligne pixel par pixel en suivant l'algorithme de Bresenham. À chaque itération de la boucle, elle calcule la position du prochain pixel sur la ligne et met à jour l'erreur. Elle utilise ensuite la méthode update_pixel de la classe Canvas pour dessiner le pixel sur le canvas et mettre à jour le statut. Si un statut d'erreur est renvoyé, la méthode s'arrête et renvoie le statut d'erreur.
+
+Une fois que la boucle est terminée, la méthode renvoie une nouvelle instance de la classe Canvas qui contient la ligne dessinée et un objet Status qui indique si des erreurs se sont produites pendant le dessin de la ligne.
 
 ### Exercice 2-H
 
@@ -334,13 +470,14 @@ def help(args: Seq[String], canvas: Canvas): (Canvas, Status) = {
       "exit" -> "Exit the application",
       "dummy" -> "Dummy command for testing purposes",
       "dummy2" -> "Dummy command for testing purposes",
-      "update_pixel" -> "Updates the color of a pixel based on his coordinates\nSyntaxe: 'update_pixel x y newColor' ",
+      "update_pixel" -> "Updates the color of a pixel based on his coordinates\nSyntaxe: 'update_pixel x,y newColor' ",
       "load_image" -> "Load an image from a file into the canvas\nSyntaxe: 'load_image imageName'\nHere, are the availables images:\ntriforce\nscala",
       "new_canvas" -> "Create a new canvas\nSyntaxe: 'new_canvas width height character'",
       "draw_line" -> "Draw a vertical or horizontal line between two pixels\nSyntaxe: 'draw_line x1,y1 x2,y2 color'",
       "draw_line2" -> "Draw a line decreasing to the right between two pixels\nSyntaxe: 'draw_line2 x1,y1 x2,y2 color'",
       "draw_line3" -> "Draw a line between two pixels\nSyntaxe: 'draw_line3 x1,y1 x2,y2 color'",
       "draw_triangle" -> "Draw a triangle between three pixels\nSyntaxe: 'draw_triangle x1,y1 x2,y2 x3,y3 color'",
+      "draw_rectangle" -> "Draw a rectangle between both top left and bottom right corners\nSyntaxe: draw_rectangle x1,y1 x2,y2 color",
       "draw_polygon" -> "Draw a polygon between multiple pixels\nSyntaxe: 'draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color'"
     )
 
@@ -368,6 +505,8 @@ Enfin, la fonction renvoie le canvas d'origine et un objet Status vide.
 
 En sommes, cette méthode permet d'informer l'utilisateur sur la liste des commandes disponible. Il pourra ensuite aller chercher plus d'information sur chaque commandes, à savoir sa description et sa syntaxe. L'application étant basé sur de l'ecriture de commande, nous avons jugé utile d'avoir un moyen accéssible d'obtenir les syntaxes exacts pour l'utilisateur sans qu'il soit obligé de lire code.
 
+___
+
 
 ## Partage des tâches
 
@@ -379,7 +518,7 @@ Pierre Collas :
 - README.md
 
 Remy Novaretti : 
-- Exercice 2-C-F-G-H-I
+- Exercice 2-C-E-F-G-H-I
 - Exercice 3
 
 Remi Delers : 
@@ -403,25 +542,3 @@ L'amélioration continue et la résolution de diverses bug a été réalisé par
 
 
 
-TO DO LISTE:
-- Expliquer dans le readme.md que la fonction update_pixel modifie le pixel avec des coordonnées commençant par 0 (donc  	modifie le pixel 2.2)
--ajouter une methode "Help" qui explique toutes les commandes possibles
-- Au lieu de mettre "invalide argument" plutot ecrire explicitement la syntaxe attendu par l'utilisateur 
-
-La méthode update_pixel prend en entrée une séquence de chaînes de caractères action et une instance de la case class Canvas. Elle vérifie d'abord que la longueur de l'action est suffisante pour mettre à jour un pixel, sinon elle renvoie une instance du case class Status avec un message d'erreur. Elle essaie ensuite de convertir les deux premiers éléments de l'action en entiers (x et y) et le troisième élément en caractère (la couleur du pixel à mettre à jour). Si la conversion réussit, elle appelle la méthode update de la case class Canvas avec un nouveau Pixel contenant les coordonnées et la couleur spécifiées, met à jour l'instance de la case class Canvas et renvoie une nouvelle instance de la case class Status sans message d'erreur. Si la conversion échoue ou si les coordonnées du pixel à mettre à jour sont hors des limites du canvas, elle renvoie une instance de la case class Status avec un message d'erreur.
-
-New canvas:
-
-Cette implémentation vérifie que la liste d'arguments passée en paramètre contient bien 3 éléments, sinon elle renvoie un statut d'erreur.
-Ensuite, la largeur, la hauteur et le caractère par défaut pour les pixels sont extraits des arguments passés en paramètre.
-On crée alors une nouvelle Vector de Pixels en utilisant la méthode fill de la classe Vector. Cette méthode permet de remplir une Vector avec des éléments générés par une fonction donnée. Ici, on génère une Vector de taille height, où chaque élément est une Vector de taille width, et où chaque élément est un Pixel initialisé avec les valeurs x=0, y=0 et le caractère par défaut.
-On copie ensuite la Canvas passée en paramètre en modifiant sa largeur, hauteur et pixels avec les valeurs calculées précédemment.
-Finalement, la nouvelle Canvas ainsi créée est renvoyée avec un Statut vide, qui indique que tout s'est bien passé.
-
-Draw_line:
-
-La fonction vérifie d'abord si la ligne est horizontale ou verticale. Si la ligne est horizontale (les coordonnées y sont égales), elle parcourt les coordonnées x entre le premier et le second point et met à jour la couleur de chaque pixel en utilisant la fonction update_pixel.
-
-Si la ligne est verticale (les coordonnées x sont égales), elle parcourt les coordonnées y entre le premier et le second point et met également à jour la couleur de chaque pixel en utilisant la fonction update_pixel.
-
-Si la ligne n'est ni horizontale ni verticale, la fonction renvoie un message d'erreur indiquant que seules les lignes horizontales et verticales sont prises en charge.

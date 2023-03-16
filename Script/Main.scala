@@ -34,7 +34,7 @@ object Main extends App {
 
     //Effacer les anciens textes
     // print("\u001b[H\u001b[2J")
-    print("\u001b[2J\u001b[;H")
+    // print("\u001b[2J\u001b[;H")
 
 
     
@@ -88,13 +88,14 @@ object Main extends App {
       "exit" -> "Exit the application",
       "dummy" -> "Dummy command for testing purposes",
       "dummy2" -> "Dummy command for testing purposes",
-      "update_pixel" -> "Updates the color of a pixel based on his coordinates\nSyntaxe: 'update_pixel x y newColor' ",
+      "update_pixel" -> "Updates the color of a pixel based on his coordinates\nSyntaxe: 'update_pixel x,y newColor' ",
       "load_image" -> "Load an image from a file into the canvas\nSyntaxe: 'load_image imageName'\nHere, are the availables images:\ntriforce\nscala",
       "new_canvas" -> "Create a new canvas\nSyntaxe: 'new_canvas width height character'",
       "draw_line" -> "Draw a vertical or horizontal line between two pixels\nSyntaxe: 'draw_line x1,y1 x2,y2 color'",
       "draw_line2" -> "Draw a line decreasing to the right between two pixels\nSyntaxe: 'draw_line2 x1,y1 x2,y2 color'",
       "draw_line3" -> "Draw a line between two pixels\nSyntaxe: 'draw_line3 x1,y1 x2,y2 color'",
       "draw_triangle" -> "Draw a triangle between three pixels\nSyntaxe: 'draw_triangle x1,y1 x2,y2 x3,y3 color'",
+      "draw_rectangle" -> "Draw a rectangle between both top left and bottom right corners\nSyntaxe: draw_rectangle x1,y1 x2,y2 color",
       "draw_polygon" -> "Draw a polygon between multiple pixels\nSyntaxe: 'draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color'"
     )
 
@@ -298,7 +299,7 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           (newCanvas4, Status())
         } catch {
           case e: Exception =>
-            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_rectangle x1,y1 x2,y2 newColor"))
         }
       case _ =>
         (canvas, Status(error = true, message = "Invalid number of arguments"))
@@ -340,9 +341,6 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
         }
       }
 
-      currentCanvas
-    }
-  }
 
   def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
@@ -382,10 +380,10 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           }
         } catch {
           case e: Exception =>
-            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_line x1,y1 x2,y2 newColor"))
         }
       case _ =>
-        (canvas, Status(error = true, message = "Invalid number of arguments"))
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_line x1,y1 x2,y2 newColor"))
     }
   }
   def draw_line2(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
@@ -417,10 +415,10 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           (newCanvas, Status())
         } catch {
           case e: Exception =>
-            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_line2 x1,y1 x2,y2 newColor"))
         }
       case _ =>
-        (canvas, Status(error = true, message = "Invalid number of arguments"))
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_line2 x1,y1 x2,y2 newColor"))
     }
   }
   def draw_line3(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
@@ -464,10 +462,10 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           (newCanvas, Status())
         } catch {
           case e: Exception =>
-            (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_line3 x1,y1 x2,y2 newColor"))
         }
       case _ =>
-        (canvas, Status(error = true, message = "Invalid number of arguments"))
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_line x1,y1 x2,y2 newColor"))
     }
   }
   def drawTriangle(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
