@@ -2,6 +2,10 @@
 Projet SCALA réalisé par Collas Pierre , Novaretti Rémy , Delers Remi
 
 
+[TOC]
+
+
+
 ## Compilation du projet:
 - Déplacez-vous dans le répertoire Script à l'aide de la commande "cd"
 - Compilez le fichier Main.scala à l'aide de la commande "scalac Main.scala"
