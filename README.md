@@ -262,6 +262,104 @@ De manière générale, cette méthode est la première version du dessin de lig
 
 ```
 
+### Appel des commandes
+
+```scala
+def execute(action: Seq[String], canvas: Canvas): (Canvas, Status) = {
+val execution: (Seq[String], Canvas) => (Canvas, Status) = action.head match {
+	case "exit" => Canvas.exit
+	case "dummy" => Canvas.dummy
+	case "dummy2" => Canvas.dummy2
+	// TODO: Add command here
+	case "help" => help
+	
+
+	case "update_pixel" => canvas.update_pixel
+	case "load_image" => canvas.load_image
+	case "new_canvas" => canvas.new_canvas
+	case "draw_line" => canvas.draw_line
+	case "draw_line2" => canvas.draw_line2
+	case "draw_line3" => canvas.draw_line3
+	case "draw_triangle" => canvas.drawTriangle
+	case "draw_polygon" => canvas.drawPolygon
+	case _ => Canvas.default
+}
+
+execution(action.tail, canvas)
+}
+```
+Cette méthode permet d'exécuter une commande à partir d'une séquence d'arguments (action) sur un objet Canvas. La méthode utilise une fonction d'exécution qui est choisie en fonction du premier argument dans la séquence (action.head).
+
+Si le premier argument correspond à une commande connue, la méthode d'exécution correspondante est choisie et exécutée avec les arguments restants (action.tail) et le canvas. Sinon, une méthode par défaut est utilisée.
+
+La méthode execute permet donc de déléguer l'exécution de chaque commande à une méthode spécifique.
+
+Ainsi, nous avons donc rajouté l'appel de commande pour chacune de nos actions
+
+### Méthode BONUS HELP
+
+```scala
+def help(args: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    val commands = Seq(
+      "exit" -> "Exit the application",
+      "dummy" -> "Dummy command for testing purposes",
+      "dummy2" -> "Dummy command for testing purposes",
+      "update_pixel" -> "Updates the color of a pixel based on his coordinates\nSyntaxe: 'update_pixel x y newColor' ",
+      "load_image" -> "Load an image from a file into the canvas\nSyntaxe: 'load_image imageName'\nHere, are the availables images:\ntriforce\nscala",
+      "new_canvas" -> "Create a new canvas\nSyntaxe: 'new_canvas width height character'",
+      "draw_line" -> "Draw a vertical or horizontal line between two pixels\nSyntaxe: 'draw_line x1,y1 x2,y2 color'",
+      "draw_line2" -> "Draw a line decreasing to the right between two pixels\nSyntaxe: 'draw_line2 x1,y1 x2,y2 color'",
+      "draw_line3" -> "Draw a line between two pixels\nSyntaxe: 'draw_line3 x1,y1 x2,y2 color'",
+      "draw_triangle" -> "Draw a triangle between three pixels\nSyntaxe: 'draw_triangle x1,y1 x2,y2 x3,y3 color'",
+      "draw_polygon" -> "Draw a polygon between multiple pixels\nSyntaxe: 'draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color'"
+    )
+
+    if (args.length == 2 && args(1) == "--info") {
+      commands.find(_._1 == args(0)) match {
+        case Some((command, info)) => println(s"\n${command.capitalize}: $info")
+        case None => println(s"\nUnknown command: ${args(0)}")
+      }
+    } else {
+      println("\n======\nHere is the list of all available commands:\n")
+      commands.foreach { case (command, _) => println(command) }
+      println("\nPlease, if you want more information about a command, write the help commande followed by the name of the command '--info' \nFor example: 'help exit --info'")
+    }
+
+    (canvas, Status())
+  }
+```
+La méthode help est une fonction qui affiche la liste des commandes disponibles pour l'application. Elle prend en entrée une séquence de chaînes de caractères a et une instance de la classe Canvas, et retourne une paire composée du canvas et d'un objet Status.
+
+La fonction commence par définir une séquence de tuples qui contient le nom et la description de chaque commande disponible. Elle vérifie ensuite si l'argument  contient deux éléments et si le deuxième élément est égal à --info. Si tel est le cas, elle recherche le nom de la commande dans la séquence de commandes et affiche sa description. Si le nom de la commande est inconnu, elle affiche un message d'erreur.
+
+Si l'argument ne contient pas deux éléments ou que le deuxième élément n'est pas égal à --info, la fonction affiche la liste de toutes les commandes disponibles en parcourant la séquence de commandes et en affichant le nom de chaque commande. Elle invite ensuite l'utilisateur à utiliser la commande help suivie du nom de la commande et de l'argument --info pour obtenir des informations supplémentaires sur une commande spécifique.
+
+Enfin, la fonction renvoie le canvas d'origine et un objet Status vide.
+
+En sommes, cette méthode permet d'informer l'utilisateur sur la liste des commandes disponible. Il pourra ensuite aller chercher plus d'information sur chaque commandes, à savoir sa description et sa syntaxe. L'application étant basé sur de l'ecriture de commande, nous avons jugé utile d'avoir un moyen accéssible d'obtenir les syntaxes exacts pour l'utilisateur sans qu'il soit obligé de lire code.
+
+
+## Partage des tâches
+
+Pierre Collas : 
+- Exercice 1-A-B-C-D 
+- Exercice 2-A-B
+- Exercice 3
+- Methode BONUS HELP
+- README.md
+
+Remy Novaretti : 
+- Exercice 2-C-F-G-H-I
+- Exercice 3
+
+Remi Delers : 
+- Exercice 2-D-E
+- Exercice 3
+
+L'amélioration continue et la résolution de diverses bug a été réalisé par les 3 membres du groupes
+
+
+
 
 
 
