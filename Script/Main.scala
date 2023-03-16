@@ -216,7 +216,7 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
             val yStart = Math.min(y1, y2)
             val yEnd = Math.max(y1, y2)
             val newCanvas = (yStart to yEnd).foldLeft(canvas) { (currentCanvas, y) =>
-              val args = Seq(x1.toString, y.toString, color)
+              val args = Seq(s"$x1,$y", color)
               val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
               if (status.error) return (updatedCanvas, status)
               updatedCanvas
@@ -227,7 +227,7 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
             val xStart = Math.min(x1, x2)
             val xEnd = Math.max(x1, x2)
             val newCanvas = (xStart to xEnd).foldLeft(canvas) { (currentCanvas, x) =>
-              val args = Seq(x.toString, y1.toString, color)
+              val args = Seq(s"$x,$y1", color)
               val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
               if (status.error) return (updatedCanvas, status)
               updatedCanvas
@@ -261,7 +261,7 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
 
           val (_, newCanvas, _) = (x1 to x2).foldLeft((y1, canvas, initialD)) {
             case ((y, currentCanvas, d), x) =>
-              val args = Seq(x.toString, y.toString, color)
+              val args = Seq(s"$x,$y", color)
               val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
               if (status.error) return (updatedCanvas, status)
 
@@ -304,8 +304,8 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
 
           val (_, newCanvas, _) = (minX to maxX).foldLeft((minY, canvas, initialError)) {
             case ((y, currentCanvas, error), x) =>
-              val args = if (steep) Seq(y.toString, x.toString, color)
-              else Seq(x.toString, y.toString, color)
+              val args = if (steep) Seq(s"$y,$x", color)
+              else Seq(s"$x,$y", color)
 
               val (updatedCanvas, status) = currentCanvas.update_pixel(args, currentCanvas)
               if (status.error) return (updatedCanvas, status)
@@ -481,7 +481,3 @@ object Canvas {
 
   
 }
-
-
-
-
