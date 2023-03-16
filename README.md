@@ -1,23 +1,28 @@
 # Project_Scala
 Projet SCALA réalisé par Collas Pierre , Novaretti Rémy , Delers Remi
 
-[Compilation du projet](#compilation-du-projet)
-[Explication du code](#explication-du-code)
-[Exercice 1-B](#exercice-1-b)
-[Exercice 1-C](#exercice-1-c)
-[Exercice 1-D](#exercice-1-d)
-[Exercice 2-A](#exercice-2-a)
-[Exercice 2-B](#exercice-2-b)
-[Exercice 2-C](#exercice-2-c)
-[Exercice 2-D](#exercice-2-d)
-[Exercice 2-E](#exercice-2-e)
-[Exercice 2-F](#exercice-2-f)
-[Exercice 2-G](#exercice-2-g)
-[Exercice 2-H](#exercice-2-h)
-[appel des commandes](#appel-des-commandes)
-[Méthode BONUS HELP](#méthode-bonus-help)
-[Partage des tâches](#partage-des-tâches)
+___
 
+# Sommaire
+1. [Compilation du projet](#compilation-du-projet)
+2. [Explication du code](#explication-du-code)
+	1. [Exercice 1-B](#exercice-1-b)
+	2. [Exercice 1-C](#exercice-1-c)
+	3. [Exercice 1-D](#exercice-1-d)
+	4. [Exercice 2-A](#exercice-2-a)
+	5. [Exercice 2-B](#exercice-2-b)
+	6. [Exercice 2-C](#exercice-2-c)
+	7. [Exercice 2-D](#exercice-2-d)
+	8. [Exercice 2-E](#exercice-2-e)
+	9. [Exercice 2-F](#exercice-2-f)
+	10. [Exercice 2-G](#exercice-2-g)
+	11. [Exercice 2-H](#exercice-2-h)
+	12. [appel des commandes](#appel-des-commandes)
+	13. [Méthode BONUS HELP](#méthode-bonus-help)
+3. [Partage des tâches](#partage-des-tâches)
+
+
+___
 
 
 
@@ -25,6 +30,8 @@ Projet SCALA réalisé par Collas Pierre , Novaretti Rémy , Delers Remi
 - Déplacez-vous dans le répertoire Script à l'aide de la commande "cd"
 - Compilez le fichier Main.scala à l'aide de la commande "scalac Main.scala"
 - Executez le script à l'aide de la commande "scala Main"
+
+___
 
 
 ## Explication du code:
@@ -496,6 +503,8 @@ Si l'argument ne contient pas deux éléments ou que le deuxième élément n'es
 Enfin, la fonction renvoie le canvas d'origine et un objet Status vide.
 
 En sommes, cette méthode permet d'informer l'utilisateur sur la liste des commandes disponible. Il pourra ensuite aller chercher plus d'information sur chaque commandes, à savoir sa description et sa syntaxe. L'application étant basé sur de l'ecriture de commande, nous avons jugé utile d'avoir un moyen accéssible d'obtenir les syntaxes exacts pour l'utilisateur sans qu'il soit obligé de lire code.
+
+___
 
 
 ## Partage des tâches
