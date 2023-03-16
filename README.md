@@ -143,6 +143,45 @@ Pour finir, la méthode retourne une paire contenant la nouvelle instance de "Ca
 
 ### Exercice 2-B
 
+```scala
+  def update_pixel(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(coords, color) => {
+        try {
+          val coordsArray = coords.split(",").map(_.toInt)
+          val x = coordsArray(0)
+          val y = coordsArray(1)
+          val newPixels = pixels.updated(y, pixels(y).updated(x, Pixel(x, y, color.head)))
+          val newCanvas = this.copy(pixels = newPixels)
+          (newCanvas, Status())
+        } catch {
+          case e: Exception =>
+          (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: update_pixel x,y newColor"))
+        }
+      }
+      case _ =>
+      (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: update_pixel x,y newColor"))
+    }
+  }
+```
+La méthode "update_pixel" ci-dessus prend en entrée deux arguments. Un de type Seq[String] et "canvas" de type Canvas. La méthode retourne ensuite un tuple contenant une nouvelle instance de Canvas et une instance de Status.
+
+La méthode commence par vérifier si les arguments ont la forme attendue en utilisant une expression "match". Si les arguments sont valides, la méthode extrait les coordonnées "x" et "y" à partir de la chaîne de caractères "coords" en utilisant la méthode "split" pour diviser la chaîne en deux sous-chaînes, en utilisant la virgule comme délimiteur. Les sous-chaînes sont ensuite converties en entiers en utilisant la méthode "toInt". La méthode utilise ensuite ces coordonnées pour mettre à jour la couleur du pixel à la position correspondante dans la matrice "pixels" du canvas. La méthode retourne ensuite une nouvelle instance de Canvas avec la matrice de pixels mise à jour et une instance de Status vide.
+
+Si les arguments ne sont pas valides, la méthode retourne une instance de Status avec un message d'erreur approprié.
+
+En résumé, cette méthode met à jour la couleur d'un pixel dans un canvas en utilisant des coordonnées de la forme "x,y" et retourne une nouvelle instance de Canvas avec la matrice de pixels mise à jour et une instance de Status pour signaler des erreurs éventuelles.
+
+Il est cependant important de noter que le système de coordonnées commence à compter à partir de 0. Ainsi, il ne sera pas possible de modifier un pixel de coordonnées 10,10 pour une canvas de largeur et hauteur de 10 car l'abscisse et l'ordonnée du canvas iront de 0 à 9.
+Nous aurions pu faire le choix d'incrémenter de 1 les coordonnées pour se rapprocher d'un résonnement plus simple pour l'utilisateur, à savoir "premier pixel de coordonné 1,1". Pour autant cette approche reste moins "mathématique" et ne semblait pas être celle que vous avez adopté dans la photo d'exmple de l'énnoncé.
+
+### Exercice 2-C
+
+```scala
+
+```
+
+
 
 
 
