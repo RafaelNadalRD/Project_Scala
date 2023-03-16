@@ -1,6 +1,7 @@
 import scala.collection.immutable.ArraySeq
 import scala.io.Source
 
+
 /**
  * Main app containg program loop
  */
@@ -258,23 +259,24 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
   */
 
   def update_pixel(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
-    arguments match {
-      case Seq(xStr, yStr, color) => {
-        try {
-          val x = xStr.toInt
-          val y = yStr.toInt
-          val newPixels = pixels.updated(y, pixels(y).updated(x, Pixel(x, y, color.head)))
-          val newCanvas = this.copy(pixels = newPixels)
-          (newCanvas, Status())
-        } catch {
-          case e: Exception =>
-          (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: update_pixel x y newColor"))
+      arguments match {
+        case Seq(coords, color) => {
+          try {
+            val coordsArray = coords.split(",").map(_.toInt)
+            val x = coordsArray(0)
+            val y = coordsArray(1)
+            val newPixels = pixels.updated(y, pixels(y).updated(x, Pixel(x, y, color.head)))
+            val newCanvas = this.copy(pixels = newPixels)
+            (newCanvas, Status())
+          } catch {
+            case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: update_pixel x,y newColor"))
+          }
         }
+        case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: update_pixel x,y newColor"))
       }
-      case _ =>
-      (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: update_pixel x y newColor"))
     }
-  }
   def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
       case Seq(p1Str, p2Str, color) => {
@@ -334,6 +336,10 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           val y1 = p1(1).toInt
           val x2 = p2(0).toInt
           val y2 = p2(1).toInt
+
+          // if (x1 > x2 || y1 > y2 || (y2 - y1) > (x2 - x1)) {
+          //   return (canvas, Status(error = true, message = "Invalid arguments\nThe first pixel must be in the top-left corner of the canvas, and the slope of the line must be less than 1."))
+          // }
 
           val dx = x2 - x1
           val dy = y2 - y1
