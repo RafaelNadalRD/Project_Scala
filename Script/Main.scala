@@ -68,7 +68,6 @@ object Main extends App {
       case "new_canvas" => canvas.new_canvas
       case "draw_line" => canvas.draw_line
       case "draw_rectangle" => canvas.draw_rectangle
-      case "fill" => canvas.fill
       case "draw_line2" => canvas.draw_line2
       case "draw_line3" => canvas.draw_line3
       case "draw_triangle" => canvas.drawTriangle
