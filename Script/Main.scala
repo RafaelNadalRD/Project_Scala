@@ -1,6 +1,7 @@
 import scala.collection.immutable.ArraySeq
 import scala.io.Source
-
+import scala.collection.mutable.Queue
+import scala.collection.mutable
 
 /**
  * Main app containg program loop
@@ -66,6 +67,7 @@ object Main extends App {
       case "update_pixel" => canvas.update_pixel
       case "load_image" => canvas.load_image
       case "new_canvas" => canvas.new_canvas
+      case "fill" => canvas.fill
       case "draw_line" => canvas.draw_line
       case "draw_rectangle" => canvas.draw_rectangle
       case "draw_line2" => canvas.draw_line2
@@ -302,7 +304,45 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
         (canvas, Status(error = true, message = "Invalid number of arguments"))
     }
   }
+  def fill(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(coords, color) => {
+        try {
+          val coordsArray = coords.split(",").map(_.toInt)
+          val x = coordsArray(0)
+          val y = coordsArray(1)
+          val newCanvas = fillRecursive(x, y, canvas.pixels(y)(x).color, color.head, canvas)
+          (newCanvas, Status())
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: fill x,y newColor"))
+        }
+      }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: fill x,y newColor"))
+    }
+  }
 
+  def fillRecursive(startX: Int, startY: Int, targetColor: Char, newColor: Char, canvas: Canvas): Canvas = {
+    def isInBounds(x: Int, y: Int): Boolean = x >= 0 && x < canvas.width && y >= 0 && y < canvas.height
+
+    if (targetColor == newColor) {
+      canvas
+    } else {
+      val queue = mutable.Queue[(Int, Int)]((startX, startY))
+      var currentCanvas = canvas
+
+      while (queue.nonEmpty) {
+        val (x, y) = queue.dequeue()
+        if (isInBounds(x, y) && currentCanvas.pixels(y)(x).color == targetColor) {
+          currentCanvas = currentCanvas.update(Pixel(x, y, newColor))
+          queue.enqueue((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))
+        }
+      }
+
+      currentCanvas
+    }
+  }
 
   def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
@@ -432,23 +472,23 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
   }
   def drawTriangle(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
-      case Seq(p1Str, p2Str, p3Str, color) => {
+      case Seq(p1Str, p2Str, p3Str, color) =>
         try {
           val p1 = p1Str.split(",")
           val p2 = p2Str.split(",")
           val p3 = p3Str.split(",")
 
-          val (canvas1, status1) = draw_line3(Seq(p1(0), p1(1), p2(0), p2(1), color), canvas)
+          val (canvas1, status1) = draw_line3(Seq(s"${p1(0)},${p1(1)}", s"${p2(0)},${p2(1)}", color), canvas)
           if (status1.error) {
             return (canvas1, status1)
           }
 
-          val (canvas2, status2) = draw_line3(Seq(p2(0), p2(1), p3(0), p3(1), color), canvas1)
+          val (canvas2, status2) = draw_line3(Seq(s"${p2(0)},${p2(1)}", s"${p3(0)},${p3(1)}", color), canvas1)
           if (status2.error) {
             return (canvas2, status2)
           }
 
-          val (canvas3, status3) = draw_line3(Seq(p3(0), p3(1), p1(0), p1(1), color), canvas2)
+          val (canvas3, status3) = draw_line3(Seq(s"${p3(0)},${p3(1)}", s"${p1(0)},${p1(1)}", color), canvas2)
           if (status3.error) {
             return (canvas3, status3)
           }
@@ -458,41 +498,46 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           case e: Exception =>
             (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_triangle x1,y1 x2,y2 x3,y3 color"))
         }
-      }
       case _ =>
         (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_triangle x1,y1 x2,y2 x3,y3 color"))
     }
   }
   def drawPolygon(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
-    val color = arguments.last
-    val points = arguments.dropRight(1)
-    
-    if (points.length < 3) {
-      return (canvas, Status(error = true, message = "Invalid number of arguments, must have at least 3 points\nDesired syntax is: draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color"))
+    val (color, points) = if (arguments.last.length == 1 && arguments.last.head.isLetter) {
+      (arguments.last, arguments.dropRight(1))
+    } else {
+      ("x", arguments)
     }
-    
+
+    if (points.length < 3) {
+      return (canvas, Status(error = true, message = "Invalid number of arguments, must have at least 3 points\nDesired syntax is: draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn [color]"))
+    }
+
     try {
       def drawEdges(p1Str: String, p2Str: String, canvas: Canvas): (Canvas, Status) = {
         val p1 = p1Str.split(",")
         val p2 = p2Str.split(",")
 
-        draw_line3(Seq(p1(0), p1(1), p2(0), p2(1), color), canvas)
+        draw_line3(Seq(s"${p1(0)},${p1(1)}", s"${p2(0)},${p2(1)}", color), canvas)
       }
 
       val initialCanvasStatus: (Canvas, Status) = (canvas, Status())
       val (finalCanvas, finalStatus) = points.zip(points.tail :+ points.head).foldLeft(initialCanvasStatus) {
         case ((currentCanvas, currentStatus), (p1, p2)) =>
           if (currentStatus.error) (currentCanvas, currentStatus)
-          else drawEdges(p1, p2, currentCanvas)
+          else {
+            val (updatedCanvas, status) = drawEdges(p1, p2, currentCanvas)
+            if (status.error) (updatedCanvas, status)
+            else (updatedCanvas.update_pixel(Seq(p1.split(",")(0), p1.split(",")(1), color), updatedCanvas)._1, status)
+          }
       }
 
       (finalCanvas, finalStatus)
     } catch {
       case e: Exception =>
-        (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color"))
+        (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn [color]"))
     }
   }
-
 
 
 }
