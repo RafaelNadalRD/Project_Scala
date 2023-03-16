@@ -1,8 +1,23 @@
 # Project_Scala
 Projet SCALA réalisé par Collas Pierre , Novaretti Rémy , Delers Remi
 
-
+[Compilation du projet](#compilation-du-projet)
+[Explication du code](#explication-du-code)
 [Exercice 1-B](#exercice-1-b)
+[Exercice 1-C](#exercice-1-c)
+[Exercice 1-D](#exercice-1-d)
+[Exercice 2-A](#exercice-2-a)
+[Exercice 2-B](#exercice-2-b)
+[Exercice 2-C](#exercice-2-c)
+[Exercice 2-D](#exercice-2-d)
+[Exercice 2-E](#exercice-2-e)
+[Exercice 2-F](#exercice-2-f)
+[Exercice 2-G](#exercice-2-g)
+[Exercice 2-H](#exercice-2-h)
+[appel des commandes](#appel-des-commandes)
+[Méthode BONUS HELP](#méthode-bonus-help)
+[Partage des tâches](#partage-des-tâches)
+
 
 
 
