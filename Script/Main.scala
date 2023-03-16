@@ -1,5 +1,6 @@
 import scala.collection.immutable.ArraySeq
 import scala.io.Source
+import scala.collection.mutable.Queue
 
 /**
  * Main app containg program loop
@@ -323,6 +324,43 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
         (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_line x1,y1 x2,y2 color"))
     }
   }
+
+  def fill(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+  arguments match {
+    case Seq(xStr, yStr, color) =>
+      try {
+        val x = xStr.toInt
+        val y = yStr.toInt
+
+        val targetColor = canvas.getPixelColor(x, y)
+        if (targetColor == color) {
+          return (canvas, Status())
+        }
+
+        val newCanvas = canvas.copy()
+        val q = Queue((x, y))
+
+        while (q.nonEmpty) {
+          val (currentX, currentY) = q.dequeue()
+          if (newCanvas.isInBounds(currentX, currentY) && newCanvas.getPixelColor(currentX, currentY) == targetColor) {
+            newCanvas.setPixelColor(currentX, currentY, color)
+
+            q.enqueue((currentX - 1, currentY))
+            q.enqueue((currentX + 1, currentY))
+            q.enqueue((currentX, currentY - 1))
+            q.enqueue((currentX, currentY + 1))
+          }
+        }
+
+        (newCanvas, Status())
+      } catch {
+        case e: Exception =>
+          (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+      }
+    case _ =>
+      (canvas, Status(error = true, message = "Invalid number of arguments"))
+  }
+}
 
   def draw_line2(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
