@@ -5,3 +5,4 @@
 /Script/.metals/
 *.log
 *.json
+*.class
