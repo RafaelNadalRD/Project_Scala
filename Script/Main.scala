@@ -210,6 +210,9 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
       try {
         val width = widthStr.toInt
         val height = heightStr.toInt
+        if (width < 0 || height < 0) {
+          throw new IllegalArgumentException("Width and height must be positive")
+        }
         val pixels = Vector.fill(height, width)(Pixel(0, 0, char.head))
         val newCanvas = Canvas(width, height, pixels)
         (newCanvas, Status())
