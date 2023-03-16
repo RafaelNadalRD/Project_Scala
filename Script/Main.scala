@@ -67,6 +67,7 @@ object Main extends App {
       case "load_image" => canvas.load_image
       case "new_canvas" => canvas.new_canvas
       case "draw_line" => canvas.draw_line
+      case "draw_rectangle" => canvas.draw_rectangle
       case "draw_line2" => canvas.draw_line2
       case "draw_line3" => canvas.draw_line3
       case "draw_triangle" => canvas.drawTriangle
@@ -277,6 +278,32 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
       (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: update_pixel x,y newColor"))
     }
   }
+
+  def draw_rectangle(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+  arguments match {
+    case Seq(x1y1Str, x2y2Str, color) =>
+      try {
+        val x1y1 = x1y1Str.split(",").map(_.toInt)
+        val x2y2 = x2y2Str.split(",").map(_.toInt)
+        val x1 = x1y1(0).toString()
+        val y1 = x1y1(1).toString()
+        val x2 = x2y2(0).toString()
+        val y2 = x2y2(1).toString()
+        val (newCanvas1, status1) = draw_line(Seq(x1.concat(",").concat(y1),x2.concat(",").concat(y1), color), canvas)
+        val (newCanvas2, status2) = draw_line(Seq(x2.concat(",").concat(y1),x2.concat(",").concat(y2), color), newCanvas1)
+        val (newCanvas3, status3) = draw_line(Seq(x2.concat(",").concat(y2),x1.concat(",").concat(y2), color), newCanvas2)
+        val (newCanvas4, status4) = draw_line(Seq(x1.concat(",").concat(y2),x1.concat(",").concat(y1), color), newCanvas3)
+        (newCanvas4, Status())
+      } catch {
+        case e: Exception =>
+          (canvas, Status(error = true, message = s"Invalid arguments: $e"))
+      }
+    case _ =>
+      (canvas, Status(error = true, message = "Invalid number of arguments"))
+  }
+}
+
+
   def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
       case Seq(p1Str, p2Str, color) => {
@@ -325,7 +352,6 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
         (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_line x1,y1 x2,y2 color"))
     }
   }
-
   def draw_line2(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
       case Seq(p1Str, p2Str, color) => {
