@@ -2,7 +2,7 @@
 Projet SCALA réalisé par Collas Pierre , Novaretti Rémy , Delers Remi
 
 
-[TOC]
+[Exercice 1-B](#exercice-1-b)
 
 
 
