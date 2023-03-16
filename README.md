@@ -1,8 +1,157 @@
 # Project_Scala
 Le projet du S1
 
-Etape 1: Executez  le fichier "Script/Main.scala" une première fois pour le compiler avec la commande Cli après avoir navigué dans son dossier avec la commande "cd":
-	 scala-cli run .\Main.scala
+
+## Compilation du projet:
+- Déplacez vous dans le répertoire Script à l'aide de la commande "cd"
+- Compilez le fichier Main.scala à l'aide de la commande "scalac Main.scala"
+- Executez le script à l'aide de la commande "scala Main"
+
+
+## Explication du code:
+Dans la partie suivante nous allons expliquer les différentes briques de codes qui ont été ajoutés.
+
+
+### Exercice 1-B
+
+```scala
+def display: Unit = {
+    if (pixels.size == 0) {
+      println("Empty Canvas")
+    } else {
+      println(s"Size: $width x $height")
+      
+      // OUR CODE//////////////////////
+      for (row <- pixels) {
+        for (pixel <- row) {
+          print(pixel)
+        }
+        println()
+      }
+      //////////////////////////////////
+    }
+  }
+```
+Pour réaliser cette exercice, nous avons ajouté un code qui parcourt les éléments du tableau en utilisant une boucle "for" imbriquée. Le premier "for" parcourt chaque ligne "row" du tableau "pixels" et le deuxième "for" parcourt chaque élément "pixel" de chaque ligne "row". Pour chaque élément "pixel", la méthode "print" est utilisée pour l'imprimer sur la même ligne sans saut de ligne. Après avoir parcouru tous les éléments d'une ligne, la méthode "println" est utilisée pour effectuer un saut de ligne et passer à la ligne suivante. Ce processus se répète pour chaque ligne du tableau, produisant ainsi une représentation visuelle de la matrice de pixels.
+
+### Exercice 1-C
+
+```scala
+object Pixel {
+  /**
+   * Create a Pixel from a string "x,y"
+   */
+  def apply(s: String): Pixel = {
+    // OUR CODE /////////////////////
+    val Array(x, y) = s.split(",")
+    Pixel(x.toInt, y.toInt)
+    ////////////////////////////////
+  }
+
+  /**
+   * Create a Pixel from a string "x,y" and a color 
+   */
+  def apply(s: String, color: Char): Pixel = {
+    // OUR CODE /////////////////////
+    val Array(x, y) = s.split(",")
+    Pixel(x.toInt, y.toInt, color)
+  }
+}
+
+```
+
+Pour cet exercice nous avons amélioré la méthode "apply" quipeux maitenant extraient les valeurs de coordonnées x et y de la chaîne de caractères en utilisant la méthode "split" de Scala pour diviser la chaîne en deux parties. Puis convertit les chaînes de caractères résultantes en entiers en utilisant la méthode "toInt". Les valeurs de coordonnées x et y ainsi obtenues sont ensuite utilisées pour créer un objet "Pixel" valide.
+
+
+### Exercice 1-D
+
+A l'occasion de cet exercice nous avons implémenté la première action qui vise à créer une canvas à l'aide de sa largeur, longueur et de son caractère par défault.
+
+```scala
+def new_canvas(arguments: Seq[String], canvas: Canvas): (Canvas, Status) =
+  arguments match {
+    case Seq(widthStr, heightStr, char) => {
+      try {
+        val width = widthStr.toInt
+        val height = heightStr.toInt
+        if (width < 0 || height < 0) {
+          throw new IllegalArgumentException("Width and height must be positive")
+        }
+        val pixels = Vector.fill(height, width)(Pixel(0, 0, char.head))
+        val newCanvas = Canvas(width, height, pixels)
+        (newCanvas, Status())
+      } catch {
+        case e: Exception =>
+          (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: new_canvas width height character"))
+      }
+    }
+    case _ =>
+      (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: new_canvas width height character"))
+  }
+```
+La méthode Scala "new_canvas" suivante prend en entrée deux arguments qui sont: une séquence de chaînes de caractères contenant les arguments nécessaires pour créer un nouveau canvas, et "canvas" qui est l'objet "Canvas" existant. La méthode retourne un tuple contenant deux valeurs: le nouveau canvas créé et un objet "Status".
+
+La méthode présente utilise une expression "match" pour déterminer la façon de créer le nouveau canvas en fonction des arguments passés. Si les arguments sont une séquence de trois chaînes de caractères, la méthode tente de convertir les deux premières chaînes de caractères en entiers pour obtenir la largeur et la hauteur du nouveau canvas. Si ces valeurs ne sont pas positives, la méthode lance une exception. Ensuite, la méthode crée un vecteur de pixels en utilisant la troisième chaîne de caractères comme couleur de tous les pixels, puis crée un nouveau canvas avec les dimensions et le vecteur de pixels créés. Enfin, la méthode retourne le nouveau canvas et un objet "Status" sans erreur.
+
+De plus, si la séquence "arguments" ne contient pas trois chaînes de caractères, la méthode retourne l'objet "Canvas" existant et un objet "Status" avec une erreur et un message indiquant que le nombre d'arguments est incorrect.
+
+
+### Exercice 2-A
+
+
+```scala
+  def load_image(action: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    val fileName = action.head
+    
+    val path = s"../Utilities/$fileName"
+    
+    val status = Status()
+    val fileContent = try {
+      Source.fromFile(path).getLines().toVector
+    } catch {
+      case e: Exception =>
+        return (canvas, status.copy(error = true, message = s"Failed to read file '$fileName'"))
+    }
+    
+    if (fileContent.isEmpty) {
+      return (canvas, status.copy(error = true, message = s"File '$fileName' is empty"))
+    }
+
+    // Create a new canvas from the file content
+    val pixels = fileContent.map(_.toCharArray).map(_.toVector).map(row => row.map(c => Pixel(0, 0, c)))
+    val newCanvas = canvas.copy(width = pixels(0).length, height = pixels.length, pixels = pixels)
+    println(s"Loaded image from file '$fileName'")
+    (newCanvas, status)
+  }
+```
+La méthode scala "load_image" prend en entrée deux arguments: une séquence de chaînes de caractères et une instance de la classe "Canvas". Cette méthode retourne un tuple contenant l'instance de la classe "Canvas" et une instance de la classe "Status".
+
+La méthode commence par extraire le nom de fichier à partir de la séquence d'actions "action.head". Ensuite, le chemin d'accès complet du fichier est construit en utilisant le nom de fichier.
+
+Pour préciser, nous avons pris la liberté d'ajouter une autre image que la triforce intiale de manière à vérifier que la méthode pouvait fonctionner avec d'autres fichiers d'images.
+
+Ensuite, la méthode crée une instance de la classe "Status" pour enregistrer les informations sur le chargement du fichier.
+
+La méthode essaie par la suite d'ouvrir le fichier à l'aide de la méthode "Source.fromFile(path).getLines().toVector". Si l'ouverture du fichier échoue, la méthode retourne une paire contenant l'instance de la classe "Canvas" passée en entrée et une instance de la classe "Status" modifiée pour signaler une erreur de lecture de fichier.
+
+Si le contenu du fichier est vide, la méthode retourne une paire contenant l'instance de la classe "Canvas" passée en entrée et une instance de la classe "Status" modifiée pour signaler que le fichier est vide.
+
+Enfin, si le contenu du fichier n'est pas vide, la méthode crée une nouvelle instance de la classe "Canvas" à partir du contenu du fichier. Elle construit ensuite les pixels de la nouvelle instance de "Canvas" à partir des caractères de chaque ligne du fichier. Chaque caractère est transformé en un objet "Pixel" ayant une valeur d'opacité de 0 et une valeur de couleur extraite du caractère.
+
+Pour finir, la méthode retourne une paire contenant la nouvelle instance de "Canvas" et une instance de la classe "Status" qui indique que l'image a été chargée avec succès.
+
+
+### Exercice 2-B
+
+
+
+
+
+
+
+
+
+
 
 
 TO DO LISTE:
