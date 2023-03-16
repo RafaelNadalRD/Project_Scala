@@ -77,10 +77,10 @@ object Main extends App {
     execution(action.tail, canvas)
   }
 
-    /**
-   * List all the available commands
-   */
-    def help(args: Seq[String], canvas: Canvas): (Canvas, Status) = {
+  /**
+ * List all the available commands
+ */
+  def help(args: Seq[String], canvas: Canvas): (Canvas, Status) = {
     val commands = Seq(
       "exit" -> "Exit the application",
       "dummy" -> "Dummy command for testing purposes",
