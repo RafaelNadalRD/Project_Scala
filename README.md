@@ -17,8 +17,9 @@ ___
 	9. [Exercice 2-F](#exercice-2-f)
 	10. [Exercice 2-G](#exercice-2-g)
 	11. [Exercice 2-H](#exercice-2-h)
-	12. [appel des commandes](#appel-des-commandes)
-	13. [Méthode BONUS HELP](#méthode-bonus-help)
+	12. [Exercice 2-I](#exercice-2-i)
+	13. [appel des commandes](#appel-des-commandes)
+	14. [Méthode BONUS HELP](#méthode-bonus-help)
 3. [Partage des tâches](#partage-des-tâches)
 
 
@@ -297,8 +298,48 @@ Si les arguments ne sont pas au bon format ou si leur nombre est incorrect, elle
 ### Exercice 2-E
 
 ```scala
+def fill(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(coords, color) => {
+        try {
+          val coordsArray = coords.split(",").map(_.toInt)
+          val x = coordsArray(0)
+          val y = coordsArray(1)
+          val newCanvas = fillRecursive(x, y, canvas.pixels(y)(x).color, color.head, canvas)
+          (newCanvas, Status())
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: fill x,y newColor"))
+        }
+      }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: fill x,y newColor"))
+    }
+  }
 
+  def fillRecursive(startX: Int, startY: Int, targetColor: Char, newColor: Char, canvas: Canvas): Canvas = {
+    def isInBounds(x: Int, y: Int): Boolean = x >= 0 && x < canvas.width && y >= 0 && y < canvas.height
+
+    if (targetColor == newColor) {
+      canvas
+    } else {
+      val queue = mutable.Queue[(Int, Int)]((startX, startY))
+      var currentCanvas = canvas
+
+      while (queue.nonEmpty) {
+        val (x, y) = queue.dequeue()
+        if (isInBounds(x, y) && currentCanvas.pixels(y)(x).color == targetColor) {
+          currentCanvas = currentCanvas.update(Pixel(x, y, newColor))
+          queue.enqueue((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))
+        }
+      }
+
+      currentCanvas
+    }
+  }
 ```
+Ci-dessus se trouve nos tentatives d'implémentations de la méthode fill. Nous avons essayé de l'implémenter de manière récursive seulement pour divers problèmes et notemment des fuites de mémoires, nous n'avons pas réussi à l'implémenter correctement.
+
 
 ### Exercice 2-F
 
@@ -425,8 +466,96 @@ Une fois que la boucle est terminée, la méthode renvoie une nouvelle instance 
 ### Exercice 2-H
 
 ```scala
+def drawTriangle(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    arguments match {
+      case Seq(p1Str, p2Str, p3Str, color) =>
+        try {
+          val p1 = p1Str.split(",")
+          val p2 = p2Str.split(",")
+          val p3 = p3Str.split(",")
 
+          val (canvas1, status1) = draw_line3(Seq(s"${p1(0)},${p1(1)}", s"${p2(0)},${p2(1)}", color), canvas)
+          if (status1.error) {
+            return (canvas1, status1)
+          }
+
+          val (canvas2, status2) = draw_line3(Seq(s"${p2(0)},${p2(1)}", s"${p3(0)},${p3(1)}", color), canvas1)
+          if (status2.error) {
+            return (canvas2, status2)
+          }
+
+          val (canvas3, status3) = draw_line3(Seq(s"${p3(0)},${p3(1)}", s"${p1(0)},${p1(1)}", color), canvas2)
+          if (status3.error) {
+            return (canvas3, status3)
+          }
+
+          (canvas3, Status())
+        } catch {
+          case e: Exception =>
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_triangle x1,y1 x2,y2 x3,y3 color"))
+        }
+      case _ =>
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_triangle x1,y1 x2,y2 x3,y3 color"))
+    }
+  }
 ```
+La fonction vérifie d'abord si la séquence arguments contient exactement quatre éléments. Si ce n'est pas le cas, elle renvoie un objet Status avec un message d'erreur. Sinon, elle essaie de diviser chaque élément de arguments en deux parties en utilisant la virgule comme séparateur. Elle renvoie également un message d'erreur s'il y a une exception lors de l'exécution de cette opération.
+
+Ensuite, la fonction appelle la fonction draw_line3 trois fois, en passant les trois paires de points et la couleur correspondante comme arguments. La fonction draw_line3 est appelée avec une séquence de chaînes de caractères contenant les coordonnées de deux points et la couleur de la ligne. Cette fonction trace une ligne entre les deux points sur le canvas et renvoie une mise à jour du canvas ainsi qu'un objet Status indiquant si l'opération a réussi ou échoué et s'il y a un message associé.
+
+Si une des appels à la fonction draw_line3 échoue, la fonction drawTriangle renvoie le canvas mis à jour et l'objet Status correspondant. Si tous les appels à la fonction draw_line3 réussissent, la fonction renvoie le canvas mis à jour et un objet Status vide.
+
+
+### Exercice 2-I
+
+```scala
+def drawPolygon(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+    val (color, points) = if (arguments.last.length == 1 && arguments.last.head.isLetter) {
+      (arguments.last, arguments.dropRight(1))
+    } else {
+      ("x", arguments)
+    }
+
+    if (points.length < 3) {
+      return (canvas, Status(error = true, message = "Invalid number of arguments, must have at least 3 points\nDesired syntax is: draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn [color]"))
+    }
+
+    try {
+      def drawEdges(p1Str: String, p2Str: String, canvas: Canvas): (Canvas, Status) = {
+        val p1 = p1Str.split(",")
+        val p2 = p2Str.split(",")
+
+        draw_line3(Seq(s"${p1(0)},${p1(1)}", s"${p2(0)},${p2(1)}", color), canvas)
+      }
+
+      val initialCanvasStatus: (Canvas, Status) = (canvas, Status())
+      val (finalCanvas, finalStatus) = points.zip(points.tail :+ points.head).foldLeft(initialCanvasStatus) {
+        case ((currentCanvas, currentStatus), (p1, p2)) =>
+          if (currentStatus.error) (currentCanvas, currentStatus)
+          else {
+            val (updatedCanvas, status) = drawEdges(p1, p2, currentCanvas)
+            if (status.error) (updatedCanvas, status)
+            else (updatedCanvas.update_pixel(Seq(p1.split(",")(0), p1.split(",")(1), color), updatedCanvas)._1, status)
+          }
+      }
+
+      (finalCanvas, finalStatus)
+    } catch {
+      case e: Exception =>
+        (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn [color]"))
+    }
+  }
+```
+
+La première chose que fait la méthode est de vérifier si le dernier élément de la séquence d'arguments est une chaîne de caractères unique et alphabétique, qui représente la couleur de remplissage pour le polygone. Si c'est le cas, cette couleur est extraite et les points sont considérés comme tous les éléments sauf le dernier. Sinon, la couleur de remplissage par défaut est "x" et tous les arguments sont considérés comme des points.
+
+Ensuite, la méthode vérifie si le nombre de points est supérieur ou égal à 3, sinon elle retourne un message d'erreur.
+
+Ensuite, la méthode définit une fonction interne appelée drawEdges, qui prend deux chaînes de caractères représentant les coordonnées de deux points et une instance de Canvas, dessine une ligne reliant les deux points sur le Canvas, et retourne le Canvas mis à jour ainsi qu'un objet Status qui indique si une erreur s'est produite.
+
+Enfin, la méthode utilise une combinaison de zip, tail et foldLeft pour itérer sur chaque paire de points consécutifs, dessiner une ligne reliant ces points sur le Canvas en utilisant la fonction drawEdges, et mettre à jour le Canvas avec la couleur de remplissage appropriée pour chaque point du polygone.
+
+Si une erreur se produit pendant le traitement, la méthode retourne le Canvas d'origine et un objet Status indiquant l'erreur rencontrée. Sinon, la méthode retourne le Canvas mis à jour et un objet Status sans erreur.
 
 ### Appel des commandes
 
@@ -522,7 +651,7 @@ Remy Novaretti :
 - Exercice 3
 
 Remi Delers : 
-- Exercice 2-D-E
+- Exercice 2-C-D-E-H
 - Exercice 3
 
 L'amélioration continue et la résolution de diverses bug a été réalisé par les 3 membres du groupes
