@@ -398,6 +398,10 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
           val x2 = p2(0).toInt
           val y2 = p2(1).toInt
 
+          if (x2 <= x1 || y2 <= y1) {
+            return (canvas, Status(error = true, message = "this action only works for lines descending on the right"))
+          }
+
           val dx = x2 - x1
           val dy = y2 - y1
           val initialD = 2 * dy - dx
@@ -422,6 +426,7 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
         (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_line2 x1,y1 x2,y2 newColor"))
     }
   }
+
   def draw_line3(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
       case Seq(p1Str, p2Str, color) =>

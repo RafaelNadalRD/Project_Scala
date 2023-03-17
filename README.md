@@ -20,7 +20,8 @@ ___
 	12. [Exercice 2-I](#exercice-2-i)
 	13. [appel des commandes](#appel-des-commandes)
 	14. [Méthode BONUS HELP](#méthode-bonus-help)
-3. [Partage des tâches](#partage-des-tâches)
+3. [Limites et critiques sur le travail effectué](#limites-et-critiques-sur-le-travail-effectué)
+4. [Partage des tâches](#partage-des-tâches)
 
 
 ___
@@ -298,47 +299,57 @@ Si les arguments ne sont pas au bon format ou si leur nombre est incorrect, elle
 ### Exercice 2-E
 
 ```scala
-def fill(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+def draw_fill(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
-      case Seq(coords, color) => {
+      case Seq(startPixelStr, newColor) =>
         try {
-          val coordsArray = coords.split(",").map(_.toInt)
-          val x = coordsArray(0)
-          val y = coordsArray(1)
-          val newCanvas = fillRecursive(x, y, canvas.pixels(y)(x).color, color.head, canvas)
+          val Array(x, y) = startPixelStr.split(",")
+          val startX = x.toInt
+          val startY = y.toInt
+          val targetColor = pixels(startY)(startX).color
+
+          def fill(x: Int, y: Int, canvas: Canvas): Canvas = {
+            if (x < 0 || x >= width || y < 0 || y >= height || canvas.pixels(y)(x).color != targetColor) {
+              canvas
+            } else {
+              val newPixels = canvas.pixels.updated(y, canvas.pixels(y).updated(x, Pixel(x, y, newColor.head)))
+              val newCanvas = canvas.copy(pixels = newPixels)
+              val canvas1 = fill(x - 1, y, newCanvas)
+              val canvas2 = fill(x + 1, y, canvas1)
+              val canvas3 = fill(x, y - 1, canvas2)
+              val canvas4 = fill(x, y + 1, canvas3)
+              canvas4
+            }
+          }
+
+          val newCanvas = fill(startX, startY, canvas)
           (newCanvas, Status())
         } catch {
           case e: Exception =>
-            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: fill x,y newColor"))
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_fill x,y newColor"))
         }
-      }
       case _ =>
-        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: fill x,y newColor"))
-    }
-  }
-
-  def fillRecursive(startX: Int, startY: Int, targetColor: Char, newColor: Char, canvas: Canvas): Canvas = {
-    def isInBounds(x: Int, y: Int): Boolean = x >= 0 && x < canvas.width && y >= 0 && y < canvas.height
-
-    if (targetColor == newColor) {
-      canvas
-    } else {
-      val queue = mutable.Queue[(Int, Int)]((startX, startY))
-      var currentCanvas = canvas
-
-      while (queue.nonEmpty) {
-        val (x, y) = queue.dequeue()
-        if (isInBounds(x, y) && currentCanvas.pixels(y)(x).color == targetColor) {
-          currentCanvas = currentCanvas.update(Pixel(x, y, newColor))
-          queue.enqueue((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))
-        }
-      }
-
-      currentCanvas
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_fill x,y newColor"))
     }
   }
 ```
-Ci-dessus se trouve nos tentatives d'implémentations de la méthode fill. Nous avons essayé de l'implémenter de manière récursive seulement pour divers problèmes et notemment des fuites de mémoires, nous n'avons pas réussi à l'implémenter correctement.
+L'algorithme fonctionne de la manière suivante :
+
+La méthode vérifie si les arguments correspondent au format attendu, c'est-à-dire une chaîne de caractères représentant les coordonnées du pixel de départ (startPixelStr) et la nouvelle couleur (newColor).
+
+Si les arguments sont valides, la méthode extrait les coordonnées x et y du pixel de départ et détermine la couleur cible (targetColor) du pixel à remplacer en utilisant les coordonnées fournies.
+
+La fonction récursive fill est définie pour remplir la zone de pixels ayant la même couleur que la couleur cible. Elle prend en entrée les coordonnées x et y actuelles et le Canvas.
+
+a. Si les coordonnées x et y sont hors des limites du Canvas ou si la couleur du pixel actuel ne correspond pas à la couleur cible, la fonction retourne simplement le Canvas sans modification.
+
+b. Si les conditions précédentes ne sont pas remplies, la fonction met à jour les pixels du Canvas avec la nouvelle couleur pour le pixel actuel. Ensuite, elle appelle récursivement la fonction fill pour les pixels adjacents (à gauche, à droite, en haut et en bas) et met à jour le Canvas à chaque étape.
+
+La fonction fill est appelée avec les coordonnées du pixel de départ et le Canvas initial. Le Canvas mis à jour est retourné et associé à un objet Status sans erreur.
+
+Si une exception est levée lors de l'exécution, la méthode retourne le Canvas initial et un objet Status avec une erreur et un message d'erreur approprié.
+
+Si le nombre d'arguments est incorrect, la méthode retourne également le Canvas initial et un objet Status avec une erreur et un message d'erreur approprié.
 
 
 ### Exercice 2-F
@@ -354,6 +365,10 @@ Ci-dessus se trouve nos tentatives d'implémentations de la méthode fill. Nous 
           val y1 = p1(1).toInt
           val x2 = p2(0).toInt
           val y2 = p2(1).toInt
+
+          if (x2 <= x1 || y2 <= y1) {
+            return (canvas, Status(error = true, message = "this action only works for lines descending on the right"))
+          }
 
           val dx = x2 - x1
           val dy = y2 - y1
@@ -395,7 +410,8 @@ La méthode met à jour le canevas à chaque fois qu'un pixel est dessiné en ap
 
 Finalement, la méthode renvoie le canevas mis à jour et un objet de type Status indiquant si l'opération s'est déroulée avec succès ou s'il y a eu une erreur.
 
-Notons que cette méthode est prévu pour fonctionner pour une ligne qui descent vers la droite.
+Notons que cette méthode est prévu pour fonctionner pour une ligne qui descent vers la droite uniquement étant donné qu'il est demandé dans l'ennoncé de "Implémenter cet algorithme pour être capable de dessiner une ligne #dans le cas particulier où le
+premier pixel est en haut à gauche du deuxième". Pour se faire, la fonction renvoi une erreur si le second pixel n'est pas en bas à droite du premier.
 
 ### Exercice 2-G
 
@@ -607,7 +623,8 @@ def help(args: Seq[String], canvas: Canvas): (Canvas, Status) = {
       "draw_line3" -> "Draw a line between two pixels\nSyntaxe: 'draw_line3 x1,y1 x2,y2 color'",
       "draw_triangle" -> "Draw a triangle between three pixels\nSyntaxe: 'draw_triangle x1,y1 x2,y2 x3,y3 color'",
       "draw_rectangle" -> "Draw a rectangle between both top left and bottom right corners\nSyntaxe: draw_rectangle x1,y1 x2,y2 color",
-      "draw_polygon" -> "Draw a polygon between multiple pixels\nSyntaxe: 'draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color'"
+      "draw_polygon" -> "Draw a polygon between multiple pixels\nSyntaxe: 'draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color'",
+      "draw_fill" -> "Fill the entire forme by updating all the nears pixels with the same color\nSyntaxe: 'draw_fill x,y color'"
     )
 
     if (args.length == 2 && args(1) == "--info") {
@@ -636,12 +653,18 @@ En sommes, cette méthode permet d'informer l'utilisateur sur la liste des comma
 
 ___
 
+## Limites et critiques sur le travail effectué
+
+Dans son état actuel, le projet affiche des warnings lors de sa compilation et nous en avons conscience. Nous savons que cela provient de l'utilisation des return qui sont dépréciés dans notre version actuelle de scala. Une première potentielle piste d'amélioration du projet serait de refractorer le code pour contourner l'utilisation des return pour améliorer la stabilité du projet dans le temps.
+Enfin, si nous devions donner la partie du projet qui nous a posé le plus de problèmes, ce serait sans doute l'exercice 2-E (Action Fill) pour laquelle nous avons mis du temps à adopter la bonne approche. Nous avons finalement essayé de nous rapprocher de l'algorithme de remplissage par diffusion (flood fill) sur une zone de pixels ayant la même couleur. C'est seulement lorsque nous avons adopté cette approche que nous avons réussi à résoudre l'exercice.
+Enfin, nous avons fait le choix de s'accorder quelques libertés et ajouter des fonctionnalités qui n'étaient pas initialement demandés comme une seconde image à charger ou la méthode Help. En effet, nous trouvions que cela rajoutait de confort pour l'utilisateur et qu'il pouvait être pertinent de l'ajouter.
+___
 
 ## Partage des tâches
 
 Pierre Collas : 
 - Exercice 1-A-B-C-D 
-- Exercice 2-A-B
+- Exercice 2-A-B-E
 - Exercice 3
 - Methode BONUS HELP
 - README.md
