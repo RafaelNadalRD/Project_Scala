@@ -67,13 +67,14 @@ object Main extends App {
       case "update_pixel" => canvas.update_pixel
       case "load_image" => canvas.load_image
       case "new_canvas" => canvas.new_canvas
-      case "fill" => canvas.fill
       case "draw_line" => canvas.draw_line
       case "draw_rectangle" => canvas.draw_rectangle
       case "draw_line2" => canvas.draw_line2
       case "draw_line3" => canvas.draw_line3
       case "draw_triangle" => canvas.drawTriangle
       case "draw_polygon" => canvas.drawPolygon
+      case "draw_fill" => canvas.draw_fill
+
       case _ => Canvas.default
     }
 
@@ -96,7 +97,8 @@ object Main extends App {
       "draw_line3" -> "Draw a line between two pixels\nSyntaxe: 'draw_line3 x1,y1 x2,y2 color'",
       "draw_triangle" -> "Draw a triangle between three pixels\nSyntaxe: 'draw_triangle x1,y1 x2,y2 x3,y3 color'",
       "draw_rectangle" -> "Draw a rectangle between both top left and bottom right corners\nSyntaxe: draw_rectangle x1,y1 x2,y2 color",
-      "draw_polygon" -> "Draw a polygon between multiple pixels\nSyntaxe: 'draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color'"
+      "draw_polygon" -> "Draw a polygon between multiple pixels\nSyntaxe: 'draw_polygon x1,y1 x2,y2 x3,y3 ... xn,yn color'",
+      "draw_fill" -> "Fill the entire forme by updating all the nears pixels with the same color\nSyntaxe: 'draw_fill x,y color'"
     )
 
     if (args.length == 2 && args(1) == "--info") {
@@ -305,45 +307,41 @@ case class Canvas(width: Int = 0, height: Int = 0, pixels: Vector[Vector[Pixel]]
         (canvas, Status(error = true, message = "Invalid number of arguments"))
     }
   }
-  def fill(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
+  
+  def draw_fill(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
-      case Seq(coords, color) => {
+      case Seq(startPixelStr, newColor) =>
         try {
-          val coordsArray = coords.split(",").map(_.toInt)
-          val x = coordsArray(0)
-          val y = coordsArray(1)
-          val newCanvas = fillRecursive(x, y, canvas.pixels(y)(x).color, color.head, canvas)
+          val Array(x, y) = startPixelStr.split(",")
+          val startX = x.toInt
+          val startY = y.toInt
+          val targetColor = pixels(startY)(startX).color
+
+          def fill(x: Int, y: Int, canvas: Canvas): Canvas = {
+            if (x < 0 || x >= width || y < 0 || y >= height || canvas.pixels(y)(x).color != targetColor) {
+              canvas
+            } else {
+              val newPixels = canvas.pixels.updated(y, canvas.pixels(y).updated(x, Pixel(x, y, newColor.head)))
+              val newCanvas = canvas.copy(pixels = newPixels)
+              val canvas1 = fill(x - 1, y, newCanvas)
+              val canvas2 = fill(x + 1, y, canvas1)
+              val canvas3 = fill(x, y - 1, canvas2)
+              val canvas4 = fill(x, y + 1, canvas3)
+              canvas4
+            }
+          }
+
+          val newCanvas = fill(startX, startY, canvas)
           (newCanvas, Status())
         } catch {
           case e: Exception =>
-            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: fill x,y newColor"))
+            (canvas, Status(error = true, message = s"Invalid arguments: $e\nDesired syntax is: draw_fill x,y newColor"))
         }
-      }
       case _ =>
-        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: fill x,y newColor"))
+        (canvas, Status(error = true, message = "Invalid number of arguments\nDesired syntax is: draw_fill x,y newColor"))
     }
   }
 
-  def fillRecursive(startX: Int, startY: Int, targetColor: Char, newColor: Char, canvas: Canvas): Canvas = {
-    def isInBounds(x: Int, y: Int): Boolean = x >= 0 && x < canvas.width && y >= 0 && y < canvas.height
-
-    if (targetColor == newColor) {
-      canvas
-    } else {
-      val queue = mutable.Queue[(Int, Int)]((startX, startY))
-      var currentCanvas = canvas
-
-      while (queue.nonEmpty) {
-        val (x, y) = queue.dequeue()
-        if (isInBounds(x, y) && currentCanvas.pixels(y)(x).color == targetColor) {
-          currentCanvas = currentCanvas.update(Pixel(x, y, newColor))
-          queue.enqueue((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))
-        }
-      }
-
-      currentCanvas
-    }
-  }
 
   def draw_line(arguments: Seq[String], canvas: Canvas): (Canvas, Status) = {
     arguments match {
