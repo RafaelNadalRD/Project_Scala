@@ -655,7 +655,6 @@ ___
 
 ## Limites et critiques sur le travail effectué
 
-Dans son état actuel, le projet affiche des warnings lors de sa compilation et nous en avons conscience. Nous savons que cela provient de l'utilisation des return qui sont dépréciés dans notre version actuelle de scala. Une première potentielle piste d'amélioration du projet serait de refractorer le code pour contourner l'utilisation des return pour améliorer la stabilité du projet dans le temps.
 Enfin, si nous devions donner la partie du projet qui nous a posé le plus de problèmes, ce serait sans doute l'exercice 2-E (Action Fill) pour laquelle nous avons mis du temps à adopter la bonne approche. Nous avons finalement essayé de nous rapprocher de l'algorithme de remplissage par diffusion (flood fill) sur une zone de pixels ayant la même couleur. C'est seulement lorsque nous avons adopté cette approche que nous avons réussi à résoudre l'exercice.
 Enfin, nous avons fait le choix de s'accorder quelques libertés et ajouter des fonctionnalités qui n'étaient pas initialement demandés comme une seconde image à charger ou la méthode Help. En effet, nous trouvions que cela rajoutait de confort pour l'utilisateur et qu'il pouvait être pertinent de l'ajouter.
 ___
